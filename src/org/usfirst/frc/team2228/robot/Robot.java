@@ -3,12 +3,20 @@ package org.usfirst.frc.team2228.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.SPI.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Joystick;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SampleRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /*
  * The VM is configured to automatically run this class, and to call the
@@ -18,11 +26,12 @@ import edu.wpi.first.wpilibj.Joystick;
  * directory.
  */
 
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot
+{
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	String autoSelected;
-	//Carrying the classes from this project's library
+	// Carrying the classes from this project's library
 	private Gear gear;
 	private Balls balls;
 	private Climb climb;
@@ -36,19 +45,22 @@ public class Robot extends IterativeRobot {
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
-	
+
 	@Override
-	public void robotInit() {
+	public void robotInit()
+	{
 		chooser.addDefault("Default Auto", defaultAuto);
 		chooser.addObject("My Auto", customAuto);
 		chooser.addObject("Do Nothing", constant.doNothing);
 		SmartDashboard.putData("Auto choices", chooser);
-		gear = new Gear();
 		balls = new Balls();
 		drive = new Drive();
 		climb = new Climb(drive.getJoystick());
-		shooter = new CANTalon (map.RIGHT_SHOOTER_ONE);
-	    SmartDashboard.putNumber ("current right leader", 0);
+		gear = new Gear(drive.getJoystick());
+
+		// shooter = new CANTalon (map.RIGHT_SHOOTER_ONE);
+		SmartDashboard.putNumber("current right leader", 0);
+
 	}
 
 	/*
@@ -63,12 +75,13 @@ public class Robot extends IterativeRobot {
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	@Override
-	public void autonomousInit() {
+	public void autonomousInit()
+	{
 		autoSelected = chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
 		drive.autonomousInit(autoSelected);
-		
+
 		System.out.println("Auto selected: " + autoSelected);
 	}
 
@@ -76,36 +89,36 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic()
+	{
 		drive.autonomousPeriodic();
-			/*switch (autoSelected) {
-		case doNothing:
-			
-			// Put custom auto code here
-			break;
-		case defaultAuto:
-		default:
-			// Put default auto code here
-			break;
-		}*/
+		/*
+		 * switch (autoSelected) { case doNothing:
+		 * 
+		 * // Put custom auto code here break; case defaultAuto: default: // Put 
+		 * default auto code here break; }
+		 */
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
-	public void teleopPeriodic() {
-		//Calling the code from the drive class
+	public void teleopPeriodic()
+	{
+		// Calling the code from the drive class
 		drive.teleopPeriodic();
-		shooter.set(.8);
+		// shooter.set(.8);
+		climb.teleopPeriodic();
+		gear.teleopPeriodic();
 	}
 
 	/**
 	 * This function is called periodically during test mode
 	 */
 	@Override
-	public void testPeriodic() {
-	
+	public void testPeriodic()
+	{
+
 	}
 }
-

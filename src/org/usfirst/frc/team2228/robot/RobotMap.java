@@ -11,22 +11,17 @@ public final class RobotMap
 	public static int RIGHT_TWO_DRIVE = 2;
 	public static int LEFT_ONE_DRIVE = 3;
 	public static int LEFT_TWO_DRIVE = 4;
-	public static int RIGHT_SHOOTER_ONE = 5;
 		
 	//*Climb
-	public static int ELEV_LIFT_CAN = 12;
-	public static int ELEV_PUSH_SOL = 4;
-	public static int ELEV_BRAKE_SOL = 7;
-	public static int ELEV_LIMIT_LOW = 1;
-	public static int ELEV_LIMIT_HIGH = 0;
-	public static int ELEV_REQ_LIGHT = 0;
-	
-	//*Fuel
-	public static int PNEU_PCM_CAN = 3;
+	public static int ROBOT_CLIMBER = 8;
 	
 	//*Gear
-	public static int PDB_CAN = 2;
-	// Constants
+	public static int LEFT_GEAR_COLLECTOR = 6;
+	public static int RIGHT_GEAR_COLLECTOR = 7;
+	public static int GEAR_ARM = 5;
+	
+	//*Fuel
+	//public static int
 	
 }
 //* means not changed because have not done yet
