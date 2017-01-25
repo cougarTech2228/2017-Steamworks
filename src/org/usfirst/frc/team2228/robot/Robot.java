@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Joystick;
-import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.CameraServer;
+//import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.I2C;
@@ -53,13 +54,14 @@ public class Robot extends IterativeRobot
 		chooser.addObject("My Auto", customAuto);
 		chooser.addObject("Do Nothing", constant.doNothing);
 		SmartDashboard.putData("Auto choices", chooser);
-		balls = new Balls();
+//		balls = new Balls();
 		drive = new Drive();
-		climb = new Climb(drive.getJoystick());
-		gear = new Gear(drive.getJoystick());
+//		climb = new Climb(drive.getJoystick());
+//		gear = new Gear(drive.getJoystick());
 
 		// shooter = new CANTalon (map.RIGHT_SHOOTER_ONE);
 		SmartDashboard.putNumber("current right leader", 0);
+		CameraServer.getInstance().startAutomaticCapture();
 
 	}
 
@@ -95,7 +97,7 @@ public class Robot extends IterativeRobot
 		/*
 		 * switch (autoSelected) { case doNothing:
 		 * 
-		 * // Put custom auto code here break; case defaultAuto: default: // Put 
+		 * // Put custom auto code here break; case defaultAuto: default: // Put
 		 * default auto code here break; }
 		 */
 	}
@@ -109,8 +111,8 @@ public class Robot extends IterativeRobot
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		// shooter.set(.8);
-		climb.teleopPeriodic();
-		gear.teleopPeriodic();
+//		climb.teleopPeriodic();
+//		gear.teleopPeriodic();
 	}
 
 	/**

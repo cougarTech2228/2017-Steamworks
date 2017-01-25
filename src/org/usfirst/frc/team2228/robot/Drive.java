@@ -52,7 +52,6 @@ public class Drive
 		left2.changeControlMode(TalonControlMode.Follower);
 		left2.enableControl();
 		left2.set(left1.getDeviceID());
-	
 
 	}
 
@@ -84,28 +83,20 @@ public class Drive
 
 		// Press a button (7) to enter "chessyDrive" otherwise drive in
 		// "tankDrive"
-		driveStyle.tankDrive(joystick1, joystick2);
-//		newButtonValue = joystick2.getRawButton(7);
-//
-//		if (newButtonValue != oldButtonValue)
-//		{
-//			if (newButtonValue == true)
-//			{
-//				if (driveType == false)
-//				{
-//					driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
-//					driveType = true;
-//				}
-//				else
-//				{
-//					driveStyle.tankDrive(joystick1, joystick2);
-//					driveType = false;
-//				}
-//
-//			}
-//			oldButtonValue = newButtonValue;
-//		}
-
+		// driveStyle.tankDrive(joystick1, joystick2);
+		changeDriveStyle();
+		if (driveType == false)
+		{
+//			driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
+			chessyDrive(joystick2, 1, joystick1, 0);
+			SmartDashboard.putString("Driving Mode", "ArcadeDrive");
+		}
+		else
+		{
+			driveStyle.tankDrive(joystick1, joystick2);
+			
+			SmartDashboard.putString("Driving Mode", "TankDrive");
+		}
 	}
 
 	public void testPeriodic()
@@ -116,5 +107,37 @@ public class Drive
 	public Joystick getJoystick()
 	{
 		return joystick1;
+	}
+	
+	public void chessyDrive(Joystick joys1, int axis1, Joystick joys2, int axis2){
+		
+		double moveValue = joys1.getRawAxis(axis1);
+		double rotateValue = -1*joys2.getRawAxis(axis2);
+		
+		driveStyle.arcadeDrive(moveValue, rotateValue, false);
+	}
+
+	private void changeDriveStyle()
+	{
+		newButtonValue = joystick2.getRawButton(7);
+
+		if (newButtonValue != oldButtonValue)
+		{
+			if (newButtonValue == true)
+			{
+				if (driveType == false)
+				{
+					//driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
+					driveType = true;
+				}
+				else
+				{
+					//driveStyle.tankDrive(joystick1, joystick2);
+					driveType = false;
+				}
+
+			}
+			oldButtonValue = newButtonValue;
+		}
 	}
 }

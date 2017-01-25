@@ -23,7 +23,7 @@ public class Gear
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
 		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
 		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
-		
+
 	}
 
 	// Called once at the beginning of the autonomous period
@@ -47,7 +47,9 @@ public class Gear
 		{
 			leftGearCollector.set(-0.9);
 			rightGearCollector.set(0.9);
-		}else if(joystick.getRawButton(3)){
+		}
+		else if (joystick.getRawButton(3))
+		{
 			leftGearCollector.set(.9);
 			rightGearCollector.set(-.9);
 		}
@@ -62,18 +64,18 @@ public class Gear
 		if (moveGearArm)
 		{
 			gearArm.set(1);
-//			leftGearCollector.set(1);
-//			rightGearCollector.set(1);
+			// leftGearCollector.set(1);
+			// rightGearCollector.set(1);
 		}
 		else if (moveGearArmDown)
 		{
-		gearArm.set(-0.5);	
+			gearArm.set(-0.5);
 		}
 		else
 		{
 			gearArm.set(0);
-//			leftGearCollector.set(0);
-//			rightGearCollector.set(0);
+			// leftGearCollector.set(0);
+			// rightGearCollector.set(0);
 		}
 
 	}
