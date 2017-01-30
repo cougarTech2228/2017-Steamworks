@@ -52,15 +52,16 @@ public class Robot extends IterativeRobot
 	{
 		chooser.addDefault("Default Auto", defaultAuto);
 		chooser.addObject("My Auto", customAuto);
-		chooser.addObject("Do Nothing", constant.doNothing);
+		chooser.addObject("Do Nothing", ConstantMap.doNothing);
+		chooser.addObject("Base Line", ConstantMap.baseLineTime);
 		SmartDashboard.putData("Auto choices", chooser);
-//		balls = new Balls();
+		//balls = new Balls();
 		drive = new Drive();
-//		climb = new Climb(drive.getJoystick());
-//		gear = new Gear(drive.getJoystick());
+		//climb = new Climb(drive.getJoystick());
+		// gear = new Gear(drive.getJoystick());
 
-		// shooter = new CANTalon (map.RIGHT_SHOOTER_ONE);
-		SmartDashboard.putNumber("current right leader", 0);
+		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
+		SmartDashboard.putString("autonomous selection", ConstantMap.doNothing);
 		CameraServer.getInstance().startAutomaticCapture();
 
 	}
@@ -79,12 +80,11 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousInit()
 	{
-		autoSelected = chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
+		//autoSelected = chooser.getSelected();
+		//autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
+		autoSelected = SmartDashboard.getString("autonomous selection", ConstantMap.doNothing);
 		drive.autonomousInit(autoSelected);
-
-		System.out.println("Auto selected: " + autoSelected);
+		System.out.println(autoSelected);
 	}
 
 	/**
@@ -93,6 +93,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
+		//System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic();
 		/*
 		 * switch (autoSelected) { case doNothing:
@@ -111,8 +112,9 @@ public class Robot extends IterativeRobot
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		// shooter.set(.8);
-//		climb.teleopPeriodic();
-//		gear.teleopPeriodic();
+		// climb.teleopPeriodic();
+		// gear.teleopPeriodic();
+
 	}
 
 	/**
@@ -121,6 +123,5 @@ public class Robot extends IterativeRobot
 	@Override
 	public void testPeriodic()
 	{
-
 	}
 }

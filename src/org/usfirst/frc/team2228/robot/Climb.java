@@ -39,13 +39,13 @@ public class Climb
 		// percentage
 		// If percentage is 100, then it will make it 0
 		// If percentage is 0, then it will make it 100
-		newValue = joystick.getRawButton(8);
+		newValue = joystick.getRawButton(9);
 
 		if (newValue != oldValue)
 		{
 			if (newValue == true)
 			{
-				climber.set(0);
+				climber.set(1);
 			}
 			else if (climber.get() == 1)
 			{

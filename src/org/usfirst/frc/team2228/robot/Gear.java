@@ -22,7 +22,7 @@ public class Gear
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
 		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
-		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
+//		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
 
 	}
 
@@ -42,16 +42,16 @@ public class Gear
 	public void teleopPeriodic()
 	{
 
-		gearCollection = joystick.getRawButton(5);
+		gearCollection = joystick.getRawButton(4);
 		if (gearCollection)
 		{
 			leftGearCollector.set(-0.9);
-			rightGearCollector.set(0.9);
+//			rightGearCollector.set(0.9);
 		}
 		else if (joystick.getRawButton(3))
 		{
 			leftGearCollector.set(.9);
-			rightGearCollector.set(-.9);
+//			rightGearCollector.set(-.9);
 		}
 		else
 		{
@@ -60,7 +60,7 @@ public class Gear
 		}
 
 		moveGearArm = joystick.getRawButton(6);
-		moveGearArmDown = joystick.getRawButton(4);
+		moveGearArmDown = joystick.getRawButton(5);
 		if (moveGearArm)
 		{
 			gearArm.set(1);
