@@ -93,7 +93,7 @@ public class Drive
 		{
 
 			case ConstantMap.doNothing:
-				System.out.println("I'm lazy");
+				System.out.println("Do Nothing");
 				autoGoal = Goal.DO_NOTHING;
 				break;
 			case ConstantMap.baseLineTime:
