@@ -14,6 +14,7 @@ public class Gear
 	private boolean moveGearArm = false;
 	private boolean moveGearArmDown = false;
 	private Joystick joystick;
+	private boolean dropDaGear = false;
 
 	// Constructor
 	public Gear(Joystick joy)
@@ -21,8 +22,8 @@ public class Gear
 
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
-		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
-//		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
+//		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
+		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
 
 	}
 
@@ -45,17 +46,17 @@ public class Gear
 		gearCollection = joystick.getRawButton(4);
 		if (gearCollection)
 		{
-			leftGearCollector.set(-0.9);
-//			rightGearCollector.set(0.9);
+//			leftGearCollector.set(-0.9);
+			rightGearCollector.set(0.9);
 		}
 		else if (joystick.getRawButton(3))
 		{
-			leftGearCollector.set(.9);
-//			rightGearCollector.set(-.9);
+//			leftGearCollector.set(.9);
+			rightGearCollector.set(-.9);
 		}
 		else
 		{
-			leftGearCollector.set(0);
+//			leftGearCollector.set(0);
 			rightGearCollector.set(0);
 		}
 
@@ -64,8 +65,8 @@ public class Gear
 		if (moveGearArm)
 		{
 			gearArm.set(1);
-			// leftGearCollector.set(1);
-			// rightGearCollector.set(1);
+//			 leftGearCollector.set(1);
+			 rightGearCollector.set(1);
 		}
 		else if (moveGearArmDown)
 		{
@@ -75,7 +76,12 @@ public class Gear
 		{
 			gearArm.set(0);
 			// leftGearCollector.set(0);
-			// rightGearCollector.set(0);
+			 rightGearCollector.set(0);
+		}
+		dropDaGear = joystick.getRawButton(2);
+		if(dropDaGear){
+			gearArm.set(1);
+			rightGearCollector.set(-1);
 		}
 
 	}
@@ -86,3 +92,4 @@ public class Gear
 
 	}
 }
+//
