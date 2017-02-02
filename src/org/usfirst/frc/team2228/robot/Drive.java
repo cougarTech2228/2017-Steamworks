@@ -32,7 +32,9 @@ public class Drive
 	private double gearValue;
 	private boolean pressed;
 	private Gyro gyro;
-
+	private double currentAngle;
+	private int counter;
+	
 	public enum Goal
 	{
 		DO_NOTHING, BASE_LINE_TIME,
@@ -76,9 +78,13 @@ public class Drive
 		autoGoal = Goal.DO_NOTHING;
 		state = State.INIT;
 		myTime = new Timer();
+		//gyro work
 		gyro = new AnalogGyro(0);
 		gyro.calibrate();
-		// SmartDashboard.putData("GearValue", gearValue);
+		currentAngle = 0;
+		counter = 0;
+		 SmartDashboard.putNumber("gyroAngle", gearValue);
+		 
 
 		// Hello person that is reading this. I am really bored and I don't know
 		// what I'm doing. Please help me, I'm trapped and they won't let me
@@ -133,6 +139,7 @@ public class Drive
 		}
 
 	}
+	//SAVE MEEEEEEEEEE
 
 	// Called continuously during the teleop period
 	public void teleopPeriodic()
@@ -143,7 +150,7 @@ public class Drive
 		// driveStyle.tankDrive(joystick1, joystick2);
 		if (gearValue > 1)
 		{
-
+//HELP
 			gearValue = 1;
 
 		}
@@ -165,7 +172,7 @@ public class Drive
 
 			gearValue -= .3;
 			pressed = true;
-
+//PLEASE
 		}
 		else if (!(joystick2.getRawButton(8) || joystick2.getRawButton(7)))
 		{
@@ -201,32 +208,36 @@ public class Drive
 			int axis2)
 	{
 
-		double moveValue = joys1.getRawAxis(axis1);
-		double rotateValue = -1 * joys2.getRawAxis(axis2);
-		// double moveValue = (joys1.getRawAxis(1)*gearValue);
-		// double rotateValue = (joys1.getRawAxis(2)*-1)*gearValue;
-
-		// if(rotateValue < 0.1 && rotateValue > -0.1){
-		//
-		// if(gyro.getAngle()>3){
-		//
-		// rotateValue-=.3;
-		//
-		// }else if(gyro.getAngle()<-3){
-		//
-		// rotateValue+=.3;
-		//
-		// }
-		//
-		// }
+//		double moveValue = joys1.getRawAxis(axis1);
+//		double rotateValue = -1 * joys2.getRawAxis(axis2);
+		 double moveValue = (joys1.getRawAxis(1)*gearValue);
+		 double rotateValue = (joys1.getRawAxis(2)*-1)*gearValue;
+		 SmartDashboard.putNumber("gyroAngle", gyro.getAngle());
+		 if(rotateValue < 0.1 && rotateValue > -0.1 && counter>10){
+		
+			 if(gyro.getAngle()>currentAngle + 1){
+			
+			 rotateValue+=.25;
+			
+			 }else if(gyro.getAngle()<currentAngle-1){
+			
+			 rotateValue-=.25;
+			
+			 }
+		
+		 }else{
+			 currentAngle = gyro.getAngle();
+			 counter = 0;
+		 }
 
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
+		counter++;
 
 	}
 
 	private void changeDriveStyle()
 	{
-		// newButtonValue = joystick2.getRawButton(7);
+		 newButtonValue = joystick2.getRawButton(1);
 
 		if (newButtonValue != oldButtonValue)
 		{
