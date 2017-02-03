@@ -5,11 +5,14 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.Enumeration;
 
 public class Drive
@@ -34,6 +37,14 @@ public class Drive
 	private Gyro gyro;
 	private double currentAngle;
 	private int counter;
+	
+	private Accelerometer accel;
+	private double accelerationI;
+	private double accelerationF;
+	private double velocityI;
+	private double velocityF;
+	private double position;
+	
 	
 	public enum Goal
 	{
@@ -83,7 +94,19 @@ public class Drive
 		gyro.calibrate();
 		currentAngle = 0;
 		counter = 0;
+		
+		//accelerometer
+		accel = new BuiltInAccelerometer(Accelerometer.Range.k4G);
+		accelerationI = 0;
+		accelerationF = 0;
+		velocityI = 0;
+		velocityF = 0;
+		position = 0;
+		
 		 SmartDashboard.putNumber("gyroAngle", gearValue);
+		 SmartDashboard.putNumber("Acceleration", 0);
+		 SmartDashboard.putNumber("Velocity", 0);
+		 SmartDashboard.putNumber("Position", 0);
 		 
 
 		// Hello person that is reading this. I am really bored and I don't know
@@ -192,6 +215,49 @@ public class Drive
 
 			SmartDashboard.putString("Driving Mode", "TankDrive");
 		}
+		
+		//acceleration code
+		
+		accelerationF = accel.getZ();
+		
+		if(accelerationF>0.05){
+			
+			if(accelerationI > accelerationF){
+				
+				velocityF = (accelerationI + ((accelerationF-accelerationI)/2))*.02 + velocityF;
+				
+			}else if(accelerationI < accelerationF){
+				
+				velocityF = (accelerationF + ((accelerationI-accelerationF)/2))*.02 + velocityF;
+				
+			}
+			
+		}else if(accelerationF < -0.05){
+			
+			if(accelerationI > accelerationF){
+				
+				velocityF = (accelerationF + ((accelerationI-accelerationF)/2))*.02 + velocityF;
+				
+			}else if(accelerationI < accelerationF){
+				
+				velocityF = (accelerationI + ((accelerationF-accelerationI)/2))*.02 + velocityF;
+				
+			}
+			
+			
+		}else{
+			accelerationF = 0;
+		}
+		
+		if(velocityF< 0.01 && velocityF > -0.01){
+			velocityF = 0;
+		}
+		
+		accelerationI = accelerationF;
+		SmartDashboard.putNumber("Acceleration", accelerationF);
+		SmartDashboard.putNumber("Velocity", velocityF);
+		
+		
 	}
 
 	public void testPeriodic()
@@ -213,7 +279,7 @@ public class Drive
 		 double moveValue = (joys1.getRawAxis(1)*gearValue);
 		 double rotateValue = (joys1.getRawAxis(2)*-1)*gearValue;
 		 SmartDashboard.putNumber("gyroAngle", gyro.getAngle());
-		 if(rotateValue < 0.1 && rotateValue > -0.1 && counter>10){
+		 if(rotateValue < 0.1 && rotateValue > -0.1 && counter>20){
 		
 			 if(gyro.getAngle()>currentAngle + 1){
 			
@@ -225,13 +291,20 @@ public class Drive
 			
 			 }
 		
+		 }else if(counter<=20 && rotateValue < 0.1 && rotateValue > -0.1){
+			 
+			 currentAngle = gyro.getAngle();
+			 counter++;
+			 
 		 }else{
+		 
 			 currentAngle = gyro.getAngle();
 			 counter = 0;
+			 
 		 }
 
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
-		counter++;
+		
 
 	}
 
