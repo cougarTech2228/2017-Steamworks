@@ -22,7 +22,7 @@ public class Gear
 
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
-//		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
+		// leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
 		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
 
 	}
@@ -43,30 +43,33 @@ public class Gear
 	public void teleopPeriodic()
 	{
 
-		gearCollection = joystick.getRawButton(RobotMap.JOY1_BUTTON_4_COLLECT_THE_GEAR);
+		gearCollection = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_4_COLLECT_THE_GEAR);
 		if (gearCollection)
 		{
-//			leftGearCollector.set(-0.9);
+			// leftGearCollector.set(-0.9);
 			rightGearCollector.set(0.9);
 		}
 		else if (joystick.getRawButton(RobotMap.JOY1_BUTTON_3_RELEASE_THE_GEAR))
 		{
-//			leftGearCollector.set(.9);
+			// leftGearCollector.set(.9);
 			rightGearCollector.set(-.9);
 		}
 		else
 		{
-//			leftGearCollector.set(0);
+			// leftGearCollector.set(0);
 			rightGearCollector.set(0);
 		}
 
-		moveGearArm = joystick.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_THE_GEAR_ARM_DOWN);
-		moveGearArmDown = joystick.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_THE_GEAR_ARM_UP);
+		moveGearArm = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_THE_GEAR_ARM_DOWN);
+		moveGearArmDown = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_THE_GEAR_ARM_UP);
 		if (moveGearArm)
 		{
 			gearArm.set(1);
-//			 leftGearCollector.set(1);
-			 rightGearCollector.set(1);
+			// leftGearCollector.set(1);
+			rightGearCollector.set(1);
 		}
 		else if (moveGearArmDown)
 		{
@@ -76,19 +79,22 @@ public class Gear
 		{
 			gearArm.set(0);
 			// leftGearCollector.set(0);
-			 rightGearCollector.set(0);
+			rightGearCollector.set(0);
 		}
-		dropDaGear = joystick.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
-		if(dropDaGear){
+		dropDaGear = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
+		if (dropDaGear)
+		{
 			gearArm.set(1);
 			rightGearCollector.set(-1);
 		}
-		dropDaGear = joystick.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
-		if (dropDaGear){
+		dropDaGear = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
+		if (dropDaGear)
+		{
 			gearArm.set(-1);
 			rightGearCollector.set(-1);
 		}
-		
 
 	}
 
