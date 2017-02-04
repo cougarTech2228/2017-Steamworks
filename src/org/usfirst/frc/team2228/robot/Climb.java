@@ -35,11 +35,12 @@ public class Climb
 	// Called continuously during the teleop period
 	public void teleopPeriodic()
 	{
-		// If button 8 is pressed, then the code will look for the motor's speed
+		// If button 9 is pressed, then the code will look for the motor's speed
 		// percentage
 		// If percentage is 100, then it will make it 0
 		// If percentage is 0, then it will make it 100
-		newValue = joystick.getRawButton(9);
+		newValue = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_9_CLIMB_ON_AND_OFF);
 
 		if (newValue != oldValue)
 		{

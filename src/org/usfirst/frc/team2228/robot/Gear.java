@@ -7,11 +7,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Gear
 {
 	private CANTalon gearArm;
-	private CANTalon leftGearCollector;
 	private CANTalon rightGearCollector;
 	private boolean gearCollection = false;
-	private boolean gearNothing = false;
-	private boolean moveGearArm = false;
+	private boolean moveGearArmUp = false;
 	private boolean moveGearArmDown = false;
 	private Joystick joystick;
 	private boolean dropDaGear = false;
@@ -22,7 +20,7 @@ public class Gear
 
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
-//		leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
+		// leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
 		rightGearCollector = new CANTalon(RobotMap.RIGHT_GEAR_COLLECTOR);
 
 	}
@@ -43,30 +41,33 @@ public class Gear
 	public void teleopPeriodic()
 	{
 
-		gearCollection = joystick.getRawButton(4);
+		gearCollection = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_4_COLLECT_THE_GEAR);
 		if (gearCollection)
 		{
-//			leftGearCollector.set(-0.9);
-			rightGearCollector.set(0.9);
+			// leftGearCollector.set(-0.9);
+			rightGearCollector.set(1);
 		}
-		else if (joystick.getRawButton(3))
+		else if (joystick.getRawButton(RobotMap.JOY1_BUTTON_3_RELEASE_THE_GEAR))
 		{
-//			leftGearCollector.set(.9);
-			rightGearCollector.set(-.9);
+			// leftGearCollector.set(.9);
+			rightGearCollector.set(-1);
 		}
 		else
 		{
-//			leftGearCollector.set(0);
+			// leftGearCollector.set(0);
 			rightGearCollector.set(0);
 		}
 
-		moveGearArm = joystick.getRawButton(6);
-		moveGearArmDown = joystick.getRawButton(5);
-		if (moveGearArm)
+		moveGearArmUp = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_ARM_UP);
+		moveGearArmDown = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_ARM_DOWN);
+		if (moveGearArmUp)
 		{
 			gearArm.set(1);
-//			 leftGearCollector.set(1);
-			 rightGearCollector.set(1);
+			// leftGearCollector.set(1);
+			// rightGearCollector.set(1);
 		}
 		else if (moveGearArmDown)
 		{
@@ -76,12 +77,14 @@ public class Gear
 		{
 			gearArm.set(0);
 			// leftGearCollector.set(0);
-			 rightGearCollector.set(0);
+			rightGearCollector.set(0);
 		}
-		dropDaGear = joystick.getRawButton(2);
-		if(dropDaGear){
-			gearArm.set(1);
-			rightGearCollector.set(-1);
+		dropDaGear = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
+		if (dropDaGear)
+		{
+			gearArm.set(-1);
+			rightGearCollector.set(1);
 		}
 
 	}

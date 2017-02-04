@@ -38,10 +38,9 @@ public class Robot extends IterativeRobot
 	private AutoChoices choisir;
 	// Carrying the classes from this project's library
 	private Gear gear;
-	private Balls balls;
+	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-	private CANTalon shooter;
 	private ConstantMap constant;
 	private RobotMap map;
 	// SendableChooser<String> chooser = new SendableChooser<>();
@@ -62,11 +61,12 @@ public class Robot extends IterativeRobot
 		SmartDashboard.putData("Auto choices", chooser);
 		// balls = new Balls();
 		drive = new Drive();
-		 climb = new Climb(drive.getJoystick());
-		 gear = new Gear(drive.getJoystick());
+		// climb = new Climb(drive.getJoystick());
+		gear = new Gear(drive.getJoystick());
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
-		SmartDashboard.putString("autonomous selection", ConstantMap.doNothing);
-//		CameraServer.getInstance().startAutomaticCapture();
+		// SmartDashboard.putString("autonomous selection",
+		// ConstantMap.doNothing);
+		CameraServer.getInstance().startAutomaticCapture();
 
 	}
 
@@ -87,10 +87,10 @@ public class Robot extends IterativeRobot
 		choisir = chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
-//		autoSelected = SmartDashboard.getString("autonomous selection",
-//				ConstantMap.doNothing);
+		// autoSelected = SmartDashboard.getString("autonomous selection",
+		// ConstantMap.doNothing);
 		drive.autonomousInit(choisir);
-		System.out.println(autoSelected);
+		// System.out.println(autoSelected);
 		if (choisir == AutoChoices.DO_NOTHING)
 		{
 			System.out.println("No Choosing 4 u");
@@ -106,7 +106,6 @@ public class Robot extends IterativeRobot
 		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic();
 		/*
-		 *tempararly hurd
 		 * // Put custom auto code here break; case defaultAuto: default: // Put
 		 * default auto code here break; }
 		 */
@@ -121,8 +120,8 @@ public class Robot extends IterativeRobot
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		// shooter.set(.8);
-		 climb.teleopPeriodic();
-		 gear.teleopPeriodic();
+		// climb.teleopPeriodic();
+		gear.teleopPeriodic();
 
 	}
 

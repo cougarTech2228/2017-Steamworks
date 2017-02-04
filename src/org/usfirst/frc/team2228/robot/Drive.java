@@ -10,12 +10,10 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.Enumeration;
+import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 
 public class Drive
 {
-	// Names of the classes
-	private Timer myTime;
 	private RobotDrive driveStyle;
 	private Joystick joystick1;
 	private Joystick joystick2;
@@ -23,8 +21,6 @@ public class Drive
 	private CANTalon left1;
 	private CANTalon right2;
 	private CANTalon left2;
-	private RobotMap map;
-	private ConstantMap constant;
 	private boolean newButtonValue = false;
 	private boolean oldButtonValue = false;
 	private boolean driveType = false;
@@ -32,6 +28,8 @@ public class Drive
 	private double gearValue;
 	private boolean pressed;
 	private Gyro gyro;
+
+	final double timeoutValue = 1.5; // seconds
 
 	public enum Goal
 	{
@@ -75,35 +73,28 @@ public class Drive
 		left2.set(left1.getDeviceID());
 		autoGoal = Goal.DO_NOTHING;
 		state = State.INIT;
-		myTime = new Timer();
+		new Timer();
 		gyro = new AnalogGyro(0);
 		gyro.calibrate();
 		// SmartDashboard.putData("GearValue", gearValue);
 
-		// Hello person that is reading this. I am really bored and I don't know
-		// what I'm doing. Please help me, I'm trapped and they won't let me
-		// out. Please. PLE...
 	}
 
 	// Called once at the beginning of the autonomous period
-	public void autonomousInit(String autoSelected)
+	public void autonomousInit(AutoChoices autoSelected)
 	{
 		System.out.println("We are in AutoInit");
 		switch (autoSelected)
 		{
 
-			case ConstantMap.doNothing:
+			case DO_NOTHING:
 				System.out.println("Do Nothing");
 				autoGoal = Goal.DO_NOTHING;
 				break;
-			case ConstantMap.baseLineTime:
+			case BASE_LINE_TIME:
 				System.out.println("Now driving to Base Line only");
 				autoGoal = Goal.BASE_LINE_TIME;
-				right1.set(0.5);
-				left1.set(0.5);
-				state = State.WAIT_FOR_TIME;
-				startTime = myTime.getFPGATimestamp();
-				startTime += 1.5;
+				state = State.INIT;
 				break;
 			default:
 
@@ -119,16 +110,37 @@ public class Drive
 			case DO_NOTHING:
 				break;
 			case BASE_LINE_TIME:
-				if (state == State.WAIT_FOR_TIME)
+				if (state == State.INIT)
 				{
-					if (myTime.getFPGATimestamp() >= startTime)
-						;
+					right1.set(0.5);
+					left1.set(0.5);
+					state = State.WAIT_FOR_TIME;
+					startTime = Timer.getFPGATimestamp();
+					System.out.println("Start:");
+					System.out.println(startTime);
+					startTime += timeoutValue;
+					System.out.println("end:");
+					System.out.println(startTime);
+				}
+				else if (state == State.WAIT_FOR_TIME)
+				{
+					if (Timer.getFPGATimestamp() >= startTime)
+
 					{
 						right1.set(0);
 						left1.set(0);
 						state = State.DONE;
+						System.out.println("dun!");
+						System.out.println(Timer.getFPGATimestamp());
 					}
 				}
+				else
+				{
+
+				}
+				break;
+			default:
+				System.out.println("at default");
 
 		}
 
@@ -153,21 +165,24 @@ public class Drive
 			gearValue = .4;
 
 		}
-		else if (joystick2.getRawButton(8) && !pressed)
+		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_INCREASE_SPEED)
+				&& !pressed)
 		{
 
 			gearValue += .3;
 			pressed = true;
 
 		}
-		else if (joystick2.getRawButton(7) && !pressed)
+		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_7_DECREASE_SPEED)
+				&& !pressed)
 		{
 
 			gearValue -= .3;
 			pressed = true;
 
 		}
-		else if (!(joystick2.getRawButton(8) || joystick2.getRawButton(7)))
+		else if (!(joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_INCREASE_SPEED)
+				|| joystick2.getRawButton(7)))
 		{
 			pressed = false;
 		}
@@ -194,17 +209,17 @@ public class Drive
 
 	public Joystick getJoystick()
 	{
-		return joystick1;
+		return joystick2;
 	}
 
 	public void chessyDrive(Joystick joys1, int axis1, Joystick joys2,
 			int axis2)
 	{
 
-		double moveValue = joys1.getRawAxis(axis1);
-		double rotateValue = -1 * joys2.getRawAxis(axis2);
-		// double moveValue = (joys1.getRawAxis(1)*gearValue);
-		// double rotateValue = (joys1.getRawAxis(2)*-1)*gearValue;
+		// double moveValue = joys1.getRawAxis(axis1);
+		// double rotateValue = -1 * joys2.getRawAxis(axis2);
+		double moveValue = (joys1.getRawAxis(1) * gearValue);
+		double rotateValue = (joys1.getRawAxis(2) * -1) * gearValue;
 
 		// if(rotateValue < 0.1 && rotateValue > -0.1){
 		//
