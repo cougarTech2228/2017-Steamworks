@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SPI.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Joystick;
@@ -32,6 +33,7 @@ public class Robot extends IterativeRobot
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	String autoSelected;
+	private AutoChoices choisir;
 	// Carrying the classes from this project's library
 	private Gear gear;
 	private Balls balls;
@@ -40,7 +42,8 @@ public class Robot extends IterativeRobot
 	private CANTalon shooter;
 	private ConstantMap constant;
 	private RobotMap map;
-	SendableChooser<String> chooser = new SendableChooser<>();
+	// SendableChooser<String> chooser = new SendableChooser<>();
+	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();
 
 	/*
 	 * This function is run when the robot is first started up and should be
@@ -50,19 +53,21 @@ public class Robot extends IterativeRobot
 	@Override
 	public void robotInit()
 	{
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		chooser.addObject("Do Nothing", ConstantMap.doNothing);
-		chooser.addObject("Base Line", ConstantMap.baseLineTime);
+		// chooser.addDefault("Default Auto", defaultAuto);
+		// chooser.addObject("My Auto", customAuto);
+		chooser.addDefault("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
+		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME);
 		SmartDashboard.putData("Auto choices", chooser);
-		//balls = new Balls();
+		// balls = new Balls();
 		drive = new Drive();
 		//climb = new Climb(drive.getJoystick());
 		 gear = new Gear(drive.getJoystick());
 
+		 climb = new Climb(drive.getJoystick());
+		 gear = new Gear(drive.getJoystick());
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
 		SmartDashboard.putString("autonomous selection", ConstantMap.doNothing);
-		CameraServer.getInstance().startAutomaticCapture();
+//		CameraServer.getInstance().startAutomaticCapture();
 
 	}
 
@@ -80,11 +85,17 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousInit()
 	{
-		//autoSelected = chooser.getSelected();
-		//autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
-		autoSelected = SmartDashboard.getString("autonomous selection", ConstantMap.doNothing);
-		drive.autonomousInit(autoSelected);
+		choisir = chooser.getSelected();
+		// autoSelected = SmartDashboard.getString("Auto Selector",
+		// defaultAuto);
+//		autoSelected = SmartDashboard.getString("autonomous selection",
+//				ConstantMap.doNothing);
+		drive.autonomousInit(choisir);
 		System.out.println(autoSelected);
+		if (choisir == AutoChoices.DO_NOTHING)
+		{
+			System.out.println("No Choosing 4 u");
+		}
 	}
 
 	/**
@@ -93,11 +104,9 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
-		//System.out.println("You have reached autonomousPeriodic");
+		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic();
 		/*
-		 * switch (autoSelected) { case doNothing:
-		 * 
 		 * // Put custom auto code here break; case defaultAuto: default: // Put
 		 * default auto code here break; }
 		 */
@@ -113,6 +122,8 @@ public class Robot extends IterativeRobot
 		drive.teleopPeriodic();
 		// shooter.set(.8);
 //		 climb.teleopPeriodic();
+		 gear.teleopPeriodic();
+		 climb.teleopPeriodic();
 		 gear.teleopPeriodic();
 
 	}

@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Enumeration;
 
+import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
+
 public class Drive
 {
 	// Names of the classes
@@ -115,17 +117,17 @@ public class Drive
 	}
 
 	// Called once at the beginning of the autonomous period
-	public void autonomousInit(String autoSelected)
+	public void autonomousInit(AutoChoices autoSelected)
 	{
 		System.out.println("We are in AutoInit");
 		switch (autoSelected)
 		{
 
-			case ConstantMap.doNothing:
+			case DO_NOTHING:
 				System.out.println("Do Nothing");
 				autoGoal = Goal.DO_NOTHING;
 				break;
-			case ConstantMap.baseLineTime:
+			case BASE_LINE_TIME:
 				System.out.println("Now driving to Base Line only");
 				autoGoal = Goal.BASE_LINE_TIME;
 				right1.set(0.5);
@@ -183,21 +185,21 @@ public class Drive
 			gearValue = .4;
 
 		}
-		else if (joystick2.getRawButton(8) && !pressed)
+		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_SPEED_INCREASE) && !pressed)
 		{
 
 			gearValue += .3;
 			pressed = true;
 
 		}
-		else if (joystick2.getRawButton(7) && !pressed)
+		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_7_SPEED_DECREASE) && !pressed)
 		{
 
 			gearValue -= .3;
 			pressed = true;
 //PLEASE
 		}
-		else if (!(joystick2.getRawButton(8) || joystick2.getRawButton(7)))
+		else if (!(joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_SPEED_INCREASE) || joystick2.getRawButton(RobotMap.JOY2_BUTTON_7_SPEED_DECREASE)))
 		{
 			pressed = false;
 		}
@@ -310,7 +312,7 @@ public class Drive
 
 	private void changeDriveStyle()
 	{
-		 newButtonValue = joystick2.getRawButton(1);
+		 newButtonValue = joystick2.getRawButton(RobotMap.JOY2_BUTTON_1_DRIVE_TYPE_SWITCH);
 
 		if (newButtonValue != oldButtonValue)
 		{
