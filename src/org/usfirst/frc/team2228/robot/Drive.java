@@ -112,8 +112,7 @@ public class Drive
 			case BASE_LINE_TIME:
 				if (state == State.INIT)
 				{
-					right1.set(0.5);
-					left1.set(0.5);
+					driveStyle.arcadeDrive(0.5, 0, false);
 					state = State.WAIT_FOR_TIME;
 					startTime = Timer.getFPGATimestamp();
 					System.out.println("Start:");
