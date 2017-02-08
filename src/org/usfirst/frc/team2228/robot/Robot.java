@@ -12,6 +12,7 @@ import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.CameraServer;
 //import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,12 +38,12 @@ public class Robot extends IterativeRobot
 	String autoSelected;
 	private AutoChoices choisir;
 	// Carrying the classes from this project's library
+	private Joystick joystick;
 	private Gear gear;
 	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-	private ConstantMap constant;
-	private RobotMap map;
+	private PowerDistributionPanel pdp;
 	// SendableChooser<String> chooser = new SendableChooser<>();
 	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();
 
@@ -59,7 +60,9 @@ public class Robot extends IterativeRobot
 		chooser.addDefault("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
 		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME);
 		SmartDashboard.putData("Auto choices", chooser);
-		// balls = new Balls();
+		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
+		pdp = new PowerDistributionPanel();
+		fuel = new Fuel(joystick, pdp);
 		drive = new Drive();
 		// climb = new Climb(drive.getJoystick());
 		gear = new Gear(drive.getJoystick());
@@ -122,7 +125,7 @@ public class Robot extends IterativeRobot
 		// shooter.set(.8);
 		// climb.teleopPeriodic();
 		gear.teleopPeriodic();
-
+		fuel.teleopPeriodic();
 	}
 
 	/**

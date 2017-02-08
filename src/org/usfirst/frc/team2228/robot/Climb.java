@@ -9,6 +9,7 @@ public class Climb
 	private CANTalon climber;
 	private boolean newValue = false;
 	private boolean oldValue = false;
+	private boolean climbMotorValue = false;
 	private Joystick joystick;
 
 	// Constructor
@@ -46,13 +47,20 @@ public class Climb
 		{
 			if (newValue == true)
 			{
-				climber.set(1);
+				if (climbMotorValue == false)
+				{
+					climber.set(1);
+					climbMotorValue = true;
+				}
+				else
+				{
+					climber.set(0);
+					climbMotorValue = false;
+				}
+
 			}
 			else if (climber.get() == 1)
-			{
-				climber.set(0);
-			}
-			oldValue = newValue;
+				oldValue = newValue;
 		}
 
 	}
