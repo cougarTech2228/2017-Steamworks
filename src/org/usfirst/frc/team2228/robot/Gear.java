@@ -7,11 +7,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Gear
 {
 	private CANTalon gearArm;
-	private CANTalon leftGearCollector;
 	private CANTalon rightGearCollector;
 	private boolean gearCollection = false;
-	private boolean gearNothing = false;
-	private boolean moveGearArm = false;
+	private boolean moveGearArmUp = false;
 	private boolean moveGearArmDown = false;
 	private Joystick joystick;
 	private boolean dropDaGear = false;
@@ -48,12 +46,16 @@ public class Gear
 		if (gearCollection)
 		{
 			// leftGearCollector.set(-0.9);
-			rightGearCollector.set(0.9);
+
+			rightGearCollector.set(1);
+
 		}
 		else if (joystick.getRawButton(RobotMap.JOY1_BUTTON_3_RELEASE_THE_GEAR))
 		{
 			// leftGearCollector.set(.9);
-			rightGearCollector.set(-.9);
+
+			rightGearCollector.set(-1);
+
 		}
 		else
 		{
@@ -61,11 +63,13 @@ public class Gear
 			rightGearCollector.set(0);
 		}
 
-		moveGearArm = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_THE_GEAR_ARM_DOWN);
+
+		moveGearArmUp = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_ARM_UP);
 		moveGearArmDown = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_THE_GEAR_ARM_UP);
-		if (moveGearArm)
+				.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_ARM_DOWN);
+		if (moveGearArmUp)
+
 		{
 			gearArm.set(1);
 			// leftGearCollector.set(1);
@@ -85,15 +89,10 @@ public class Gear
 				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
 		if (dropDaGear)
 		{
-			gearArm.set(1);
-			rightGearCollector.set(-1);
-		}
-		dropDaGear = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
-		if (dropDaGear)
-		{
+
 			gearArm.set(-1);
-			rightGearCollector.set(-1);
+			rightGearCollector.set(1);
+
 		}
 
 	}

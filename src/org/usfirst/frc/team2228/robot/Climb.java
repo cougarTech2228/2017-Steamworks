@@ -9,6 +9,7 @@ public class Climb
 	private CANTalon climber;
 	private boolean newValue = false;
 	private boolean oldValue = false;
+	private boolean climbMotorValue = false;
 	private Joystick joystick;
 
 	// Constructor
@@ -39,19 +40,29 @@ public class Climb
 		// percentage
 		// If percentage is 100, then it will make it 0
 		// If percentage is 0, then it will make it 100
-		newValue = joystick.getRawButton(RobotMap.JOY1_CLIMB_MOTOR_POWER);
+
+		newValue = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_9_CLIMB_ON_AND_OFF);
+
 
 		if (newValue != oldValue)
 		{
 			if (newValue == true)
 			{
-				climber.set(1);
+				if (climbMotorValue == false)
+				{
+					climber.set(1);
+					climbMotorValue = true;
+				}
+				else
+				{
+					climber.set(0);
+					climbMotorValue = false;
+				}
+
 			}
 			else if (climber.get() == 1)
-			{
-				climber.set(0);
-			}
-			oldValue = newValue;
+				oldValue = newValue;
 		}
 
 	}
