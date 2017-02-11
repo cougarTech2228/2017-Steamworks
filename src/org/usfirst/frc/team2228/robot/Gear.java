@@ -46,12 +46,16 @@ public class Gear
 		if (gearCollection)
 		{
 			// leftGearCollector.set(-0.9);
+
 			rightGearCollector.set(1);
+
 		}
 		else if (joystick.getRawButton(RobotMap.JOY1_BUTTON_3_RELEASE_THE_GEAR))
 		{
 			// leftGearCollector.set(.9);
+
 			rightGearCollector.set(-1);
+
 		}
 		else
 		{
@@ -59,19 +63,21 @@ public class Gear
 			rightGearCollector.set(0);
 		}
 
+
 		moveGearArmUp = joystick
 				.getRawButton(RobotMap.JOY1_BUTTON_6_MOVE_ARM_UP);
 		moveGearArmDown = joystick
 				.getRawButton(RobotMap.JOY1_BUTTON_5_MOVE_ARM_DOWN);
 		if (moveGearArmUp)
+
 		{
 			gearArm.set(1);
 			// leftGearCollector.set(1);
-			// rightGearCollector.set(1);
+			rightGearCollector.set(1);
 		}
 		else if (moveGearArmDown)
 		{
-			gearArm.set(-0.5);
+			gearArm.set(-1);
 		}
 		else
 		{
@@ -83,8 +89,10 @@ public class Gear
 				.getRawButton(RobotMap.JOY1_BUTTON_2_DROP_THE_GEAR);
 		if (dropDaGear)
 		{
+
 			gearArm.set(-1);
 			rightGearCollector.set(1);
+
 		}
 
 	}

@@ -5,11 +5,14 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 
 public class Drive
@@ -28,6 +31,15 @@ public class Drive
 	private double gearValue;
 	private boolean pressed;
 	private Gyro gyro;
+	private double currentAngle;
+	private int counter;
+
+	private Accelerometer accel;
+	private double accelerationI;
+	private double accelerationF;
+	private double velocityI;
+	private double velocityF;
+	private double position;
 
 	final double timeoutValue = 1.5; // seconds
 
@@ -73,10 +85,24 @@ public class Drive
 		left2.set(left1.getDeviceID());
 		autoGoal = Goal.DO_NOTHING;
 		state = State.INIT;
-		new Timer();
+
 		gyro = new AnalogGyro(0);
 		gyro.calibrate();
-		// SmartDashboard.putData("GearValue", gearValue);
+		currentAngle = 0;
+		counter = 0;
+
+		// accelerometer
+		accel = new BuiltInAccelerometer(Accelerometer.Range.k4G);
+		accelerationI = 0;
+		accelerationF = 0;
+		velocityI = 0;
+		velocityF = 0;
+		position = 0;
+
+		SmartDashboard.putNumber("gyroAngle", gearValue);
+		SmartDashboard.putNumber("Acceleration", 0);
+		SmartDashboard.putNumber("Velocity", 0);
+		SmartDashboard.putNumber("Position", 0);
 
 	}
 
@@ -144,6 +170,7 @@ public class Drive
 		}
 
 	}
+	// SAVE MEEEEEEEEEE
 
 	// Called continuously during the teleop period
 	public void teleopPeriodic()
@@ -154,7 +181,7 @@ public class Drive
 		// driveStyle.tankDrive(joystick1, joystick2);
 		if (gearValue > 1)
 		{
-
+			// HELP
 			gearValue = 1;
 
 		}
@@ -163,8 +190,9 @@ public class Drive
 
 			gearValue = .4;
 
-		}
+
 		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_INCREASE_SPEED)
+
 				&& !pressed)
 		{
 
@@ -172,16 +200,20 @@ public class Drive
 			pressed = true;
 
 		}
+
 		else if (joystick2.getRawButton(RobotMap.JOY2_BUTTON_7_DECREASE_SPEED)
+
 				&& !pressed)
 		{
 
 			gearValue -= .3;
 			pressed = true;
-
+			// PLEASE
 		}
+
 		else if (!(joystick2.getRawButton(RobotMap.JOY2_BUTTON_8_INCREASE_SPEED)
 				|| joystick2.getRawButton(7)))
+
 		{
 			pressed = false;
 		}
@@ -199,6 +231,67 @@ public class Drive
 
 			SmartDashboard.putString("Driving Mode", "TankDrive");
 		}
+
+		// acceleration code
+
+		accelerationF = accel.getZ();
+
+		if (accelerationF > 0.05)
+		{
+
+			if (accelerationI > accelerationF)
+			{
+
+				velocityF = (accelerationI
+						+ ((accelerationF - accelerationI) / 2)) * .02
+						+ velocityF;
+
+			}
+			else if (accelerationI < accelerationF)
+			{
+
+				velocityF = (accelerationF
+						+ ((accelerationI - accelerationF) / 2)) * .02
+						+ velocityF;
+
+			}
+
+		}
+		else if (accelerationF < -0.05)
+		{
+
+			if (accelerationI > accelerationF)
+			{
+
+				velocityF = (accelerationF
+						+ ((accelerationI - accelerationF) / 2)) * .02
+						+ velocityF;
+
+			}
+			else if (accelerationI < accelerationF)
+			{
+
+				velocityF = (accelerationI
+						+ ((accelerationF - accelerationI) / 2)) * .02
+						+ velocityF;
+
+			}
+
+		}
+		else
+		{
+			accelerationF = 0;
+		}
+
+		if (velocityF < 0.01 && velocityF > -0.01)
+		{
+			velocityF = 0;
+		}
+
+		accelerationI = accelerationF;
+		SmartDashboard.putNumber("Acceleration", accelerationF);
+		SmartDashboard.putNumber("Velocity", velocityF);
+
 	}
 
 	public void testPeriodic()
@@ -220,6 +313,7 @@ public class Drive
 		double moveValue = (joys1.getRawAxis(1) * gearValue);
 		double rotateValue = (joys1.getRawAxis(2) * -1) * gearValue;
 
+
 		// if(rotateValue < 0.1 && rotateValue > -0.1){
 		//
 		// if(gyro.getAngle()>3){
@@ -234,13 +328,15 @@ public class Drive
 		//
 		// }
 
+
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 
 	}
 
 	private void changeDriveStyle()
 	{
-		// newButtonValue = joystick2.getRawButton(7);
+		newButtonValue = joystick2
+				.getRawButton(RobotMap.JOY2_BUTTON_1_DRIVE_TYPE_SWITCH);
 
 		if (newButtonValue != oldButtonValue)
 		{

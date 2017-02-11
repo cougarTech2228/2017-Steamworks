@@ -34,7 +34,7 @@ public final class RobotMap
 		public static int JOY2_BUTTON_8_INCREASE_SPEED = 8;
 		// button 7 on joystick 2 decreases the speed of the robot
 		public static int JOY2_BUTTON_7_DECREASE_SPEED = 7;
-
+  
 // Climb
 	// CANTalon ID
 		public static int ROBOT_CLIMBER = 8;
