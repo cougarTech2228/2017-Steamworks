@@ -41,7 +41,7 @@ public class Climb
 		// If percentage is 100, then it will make it 0
 		// If percentage is 0, then it will make it 100
 		newValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_9_CLIMB_ON_AND_OFF);
+				.getRawButton(RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF);
 
 		if (newValue != oldValue)
 		{

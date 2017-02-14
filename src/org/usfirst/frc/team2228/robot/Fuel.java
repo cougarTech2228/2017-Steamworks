@@ -17,12 +17,18 @@ public class Fuel
 	private boolean lastConveyorValue = false;
 	private boolean firstLoadStationValue = false;
 	private boolean lastLoadStationValue = false;
+	private boolean firstFurnaceValue = false;
+	private boolean lastFurnaceValue = false;
 	private boolean conveyorMotorValue = false;
 	private boolean loadStationMotorValue = false;
+	private boolean furnaceMotorValue = false;
 	private final double conveyorSpeed = 1;
+	private final double loadStationSpeed = 1;
+	private final double furnaceDispenserSpeed = 1;
 	private PowerDistributionPanel pdp;
 	private double theConveyorNowCurrent;
 	private double theLoadStationNowCurrent;
+	private double theFurnaceNowCurrent;
 
 	// Constructor
 	public Fuel(Joystick joy, PowerDistributionPanel pdpCurrent)
@@ -35,6 +41,8 @@ public class Fuel
 				RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
 		fuelConveyorRoller = new Spark(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
+		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
+		SmartDashboard.putBoolean("Furnace Roller Power", false);
 	}
 
 	// Called once at the beginning of the autonomous period
@@ -53,7 +61,7 @@ public class Fuel
 	public void teleopPeriodic()
 	{
 		firstConveyorValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_1_FLOOR_FUEL_COLLECTOR);
+				.getRawButton(RobotMap.JOY1_BUTTON_4_FLOOR_FUEL_COLLECTOR);
 
 		if (firstConveyorValue != lastConveyorValue)
 		{
@@ -76,30 +84,6 @@ public class Fuel
 			lastConveyorValue = firstConveyorValue;
 		}
 
-		firstLoadStationValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_7_LOAD_STATION_COLLECTOR);
-
-		if (firstLoadStationValue != lastLoadStationValue)
-		{
-			if (firstLoadStationValue == true)
-			{
-				if (loadStationMotorValue == false)
-				{
-					fuelLoadStationRoller.set(conveyorSpeed);
-					SmartDashboard.putBoolean("Fuel Roller Power", true);
-					loadStationMotorValue = true;
-				}
-				else
-				{
-					fuelLoadStationRoller.set(0);
-					SmartDashboard.putBoolean("Fuel Roller Power", false);
-					loadStationMotorValue = false;
-				}
-			}
-
-			lastConveyorValue = firstConveyorValue;
-		}
-		// >_<
 		theConveyorNowCurrent = pdp.getCurrent(0);
 		SmartDashboard.putNumber("Fuel Conveyor Current",
 				theConveyorNowCurrent);
@@ -109,6 +93,33 @@ public class Fuel
 			fuelConveyorRoller.set(0);
 			SmartDashboard.putBoolean("Fuel Conveyor Emergency Shut Down",
 					true);
+		}
+		// >o<
+
+		firstLoadStationValue = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_7_LOAD_STATION_COLLECTOR);
+
+		if (firstLoadStationValue != lastLoadStationValue)
+		{
+			if (firstLoadStationValue == true)
+			{
+				if (loadStationMotorValue == false)
+				{
+					fuelLoadStationRoller.set(loadStationSpeed);
+					SmartDashboard.putBoolean("Fuel Load Station Roller Power",
+							true);
+					loadStationMotorValue = true;
+				}
+				else
+				{
+					fuelLoadStationRoller.set(0);
+					SmartDashboard.putBoolean("Fuel Load Station Roller Power",
+							false);
+					loadStationMotorValue = false;
+				}
+			}
+
+			lastConveyorValue = firstConveyorValue;
 		}
 
 		theLoadStationNowCurrent = pdp.getCurrent(0);
@@ -121,6 +132,41 @@ public class Fuel
 			SmartDashboard.putBoolean("Fuel Load Station Emergency Shut Down",
 					true);
 		}
+		// >_<
+
+		firstFurnaceValue = joystick
+				.getRawButton(RobotMap.JOY1_BUTTON_8_FURNACE_ROLLER_DISPENSER);
+
+		if (firstFurnaceValue != lastFurnaceValue)
+		{
+			if (firstFurnaceValue == true)
+			{
+				if (furnaceMotorValue == false)
+				{
+					fuelFurnaceRoller.set(furnaceDispenserSpeed
+							* RobotMap.FUEL_FURNACE_OUT_DIR);
+					SmartDashboard.putBoolean("Furnace Roller Power", true);
+					furnaceMotorValue = true;
+				}
+				else
+				{
+					fuelFurnaceRoller.set(0);
+					SmartDashboard.putBoolean("Furnace Roller Power", false);
+					furnaceMotorValue = false;
+				}
+			}
+
+			lastConveyorValue = firstConveyorValue;
+		}
+
+		theFurnaceNowCurrent = pdp.getCurrent(0);
+		SmartDashboard.putNumber("Fuel Furnace Current", theFurnaceNowCurrent);
+
+		if (pdp.getCurrent(0) >= ConstantMap.MAX_FURNACE_CURRENT)
+		{
+			fuelLoadStationRoller.set(0);
+			SmartDashboard.putBoolean("Fuel Furnace Emergency Shut Down", true);
+		}
 
 	}
 
@@ -128,7 +174,7 @@ public class Fuel
 	public void testPeriodic()
 	{
 		firstConveyorValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_1_FLOOR_FUEL_COLLECTOR);
+				.getRawButton(RobotMap.JOY1_BUTTON_4_FLOOR_FUEL_COLLECTOR);
 
 		if (firstConveyorValue != lastConveyorValue)
 		{
