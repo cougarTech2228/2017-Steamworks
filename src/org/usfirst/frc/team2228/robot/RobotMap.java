@@ -32,7 +32,7 @@ public final class RobotMap
 		// Button 6 collects the fuel off of the floor
 		public static int JOY1_BUTTON_4_FLOOR_FUEL_COLLECTOR = 4;
 		// Button 7 collects the fuel from the load station
-		public static int JOY1_BUTTON_7_LOAD_STATION_COLLECTOR = 7;
+		 public static int JOY1_BUTTON_7_LOAD_STATION_COLLECTOR = 7;
 		// Button 8 dispenses the fuel into the furnace
 		public static int JOY1_BUTTON_8_FURNACE_ROLLER_DISPENSER = 8;
 	// Other stuffs

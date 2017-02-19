@@ -101,7 +101,7 @@ public class Gear
 		// gearArm.set(dropArm);
 		// gearCollector.set(dropRelease);
 		// }
-
+		SmartDashboard.putNumber("gearJaw Current", gearJaw.getOutputCurrent());
 
 	}
 
