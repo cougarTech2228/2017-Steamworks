@@ -149,7 +149,7 @@ public class Drive {
 			turnAngle = -60;
 			autoGoal = Goal.GEAR_PLACEMENT;
 			state = State.INIT;
-			timeOutValueSecondMove = 1.1;
+			timeOutValueSecondMove = 1.11;
 			state = State.INIT;
 			break;
 		case RIGHT_BLUE:
