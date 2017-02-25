@@ -13,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -50,6 +51,11 @@ public class Robot extends IterativeRobot {
 	private double centerX = 0.0;
 	private final Object imgLock = new Object();
 
+	private Servo pan;
+	private Servo tilt;
+	
+	private double panAngle;
+	private double tiltAngle;
 	/*
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -65,18 +71,27 @@ public class Robot extends IterativeRobot {
 		chooser.addObject("Right Blue Gear Placement", ConstantMap.AutoChoices.RIGHT_BLUE);
 		chooser.addObject("Left Red Gear Placement", ConstantMap.AutoChoices.LEFT_RED);
 		chooser.addObject("Right Red Gear Placement", ConstantMap.AutoChoices.RIGHT_RED);
+		chooser.addObject("No Vision Gear Placement", ConstantMap.AutoChoices.NO_VISION_GEAR_PLACEMENT);
 		SmartDashboard.putData("Auto choices", chooser);
+		
+		panAngle = 90;
+		tiltAngle = 90;
 
+		
 		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
 		pdp = new PowerDistributionPanel();
 		fuel = new Fuel(joystick, pdp);
-		drive = new Drive();
-		climb = new Climb(drive.getJoystick());
-		gear = new Gear(drive.getJoystick());
+		gear = new Gear(joystick);
+		drive = new Drive(gear, joystick);
+		climb = new Climb(joystick);
+		
+		
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
 		// SmartDashboard.putString("autonomous selection",
 		// ConstantMap.doNothing);
 
+		 pan = new Servo(3);
+		 tilt = new Servo(4);
 		SmartDashboard.putNumber("CenterX", 0);
 
 		grip = new GripPipeline();
@@ -135,7 +150,9 @@ public class Robot extends IterativeRobot {
 		drive.autonomousInit(choisir);
 
 		// System.out.println(autoSelected);
-
+		if (choisir == AutoChoices.BASE_LINE_TIME_SENSOR) {
+			System.out.println("Driving to the Base Line");
+		}
 		if (choisir == AutoChoices.DO_NOTHING) {
 			// System.out.println("No Choosing 4 u");
 		}
@@ -162,15 +179,57 @@ public class Robot extends IterativeRobot {
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
-		gear.teleopPeriodic();
+		gear.teleopPeriodic(fuel);
 
-		fuel.teleopPeriodic();
+		
+//		fuel.teleopPeriodic();
 
 		double centerX;
 		synchronized (imgLock) {
 			centerX = this.centerX;
 		}
+		
+		if(joystick.getRawButton(5)){
+			fuel.collectFuel();
+		}else if(!gear.loadingGear()){
+			fuel.fuelLoadStationRollerSet(0);
+		}
+		
+		if(joystick.getRawButton(7)){
+			fuel.dischargeFuel();
+		}else{
+			fuel.fuelFurnaceRollerSet(0);
+		}
+		
+		fuel.collectFuelFloor();
+		
+		
+		if(joystick.getPOV()==270 && panAngle < 150){
+			
+			panAngle+=1;
+			
+		}else if(joystick.getPOV()==0 && tiltAngle > 30){
+			
+			tiltAngle-=1;
+			
+		}else if(joystick.getPOV()==90 && panAngle > 30){
+			
+			panAngle -= 1;
+			
+		}else if(joystick.getPOV()==180 && tiltAngle < 150){
+			
+			tiltAngle+=1;
+			
+		}
+		
+		pan.setAngle(panAngle);
+		tilt.setAngle(tiltAngle);
+		
+		
+		SmartDashboard.putNumber("POV VALUE", joystick.getPOV());
 
+		// pan.setAngle(90);
+		// tilt.setAngle(90);
 		SmartDashboard.putNumber("CenterX", centerX);
 	}
 
