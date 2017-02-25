@@ -17,9 +17,9 @@ public final class RobotMap
 		// Button 2 collects the gear
 		public static int BUTTON_2_COLLECT_THE_GEAR = 2;
 		// Button 4 moves the arm down
-		public static int BUTTON_4_MOVE_ARM_DOWN = 4;
+		public static int BUTTON_1_MOVE_ARM_DOWN = 1;
 		// Button 1 moves the arm up
-		public static int BUTTON_1_MOVE_ARM_UP = 1;
+		public static int BUTTON_4_MOVE_ARM_UP = 4;
 		// Button 6 lets the robot collect the gear from the load station
 		public static int BUTTON_6_GEAR_COLLECTION = 6;
 		

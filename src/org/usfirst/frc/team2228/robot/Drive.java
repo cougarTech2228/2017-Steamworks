@@ -86,7 +86,7 @@ public class Drive
 
 	public enum Goal
 	{
-		DO_NOTHING, BASE_LINE_TIME_SENSOR, BASE_LINE_ENCODERS, LEFT_BLUE, RIGHT_BLUE, LEFT_RED, RIGHT_RED, CENTER, MID, GEAR_PLACEMENT
+		DO_NOTHING, BASE_LINE_TIME_SENSOR, BASE_LINE_ENCODERS, LEFT_GEAR_PLACEMENT, RIGHT_GEAR_PLACEMENT
 
 	}
 
@@ -174,57 +174,19 @@ public class Drive
 				state = State.INIT;
 				break;
 				
-			case LEFT_RED:
-				System.out.println("Left Gear Red Placement");
-				turnAngle = smallAngle;
-				autoGoal = Goal.GEAR_PLACEMENT;
-				state = State.INIT;
-				timeOutValueSecondMove = testBotleftRedTimeoutValueSecondMove;
-				testBotLeftMoveToLiftEncoder = 0;
-				break;
-				
-			case LEFT_BLUE:
-				System.out.println("Left Gear Blue Placement");
-				turnAngle = largeAngle;
-				timeOutValueSecondMove = testBotleftBlueTimeoutValueSecondMove;
-				autoGoal = Goal.GEAR_PLACEMENT;
-				state = State.INIT;
-				testBotLeftMoveToLiftEncoder = -1150;
-				break;
-				
-			case RIGHT_RED:
-				System.out.println("Right Gear Red Placement");
+			case RIGHT_GEAR_PLACEMENT:
+				System.out.println("Right Gear Placement");
 				turnAngle = -largeAngle;
-				autoGoal = Goal.GEAR_PLACEMENT;
+				timeOutValueSecondMove = testBotleftBlueTimeoutValueSecondMove;
+				autoGoal = Goal.RIGHT_GEAR_PLACEMENT;
 				state = State.INIT;
-				timeOutValueSecondMove = testBotrightRedTimeoutValueSecondMove;
-				state = State.INIT;
-				testBotLeftMoveToLiftEncoder = -550;
 				break;
 				
-			case RIGHT_BLUE:
-				System.out.println("Right Gear Blue Placement");
-				turnAngle = -smallAngle;
-				timeOutValueSecondMove = testBotrightBlueTimeoutValueSecondMove;
-				autoGoal = Goal.GEAR_PLACEMENT;
-				state = State.INIT;
-				testBotLeftMoveToLiftEncoder = 0;
-				break;
-				
-			case CENTER:
-				System.out.println("Center Gear Placement");
-				turnAngle = 0;
-				timeOutValueSecondMove = testBotcenterTimeoutValueSecondMove;
-				autoGoal = Goal.GEAR_PLACEMENT;
-				state = State.INIT;
-				testBotLeftMoveToLiftEncoder = -0;
-				break;
-				
-			case GEAR_PLACEMENT:
-				System.out.println("Test Gear Placement");
+			case LEFT_GEAR_PLACEMENT:
+				System.out.println("Left Gear Placement");
 				turnAngle = largeAngle;
 				timeOutValueSecondMove = testBotleftBlueTimeoutValueSecondMove;
-				autoGoal = Goal.GEAR_PLACEMENT;
+				autoGoal = Goal.LEFT_GEAR_PLACEMENT;
 				state = State.INIT;
 				testBotLeftMoveToLiftEncoder = 0;
 
@@ -289,11 +251,10 @@ public class Drive
 				}
 				else if (state == State.TURN)
 				{
-					if (turnAuto(50))
+					if (turnAuto(60))
 					{
 						state = State.DONE;
-						right1.set(0);
-						left1.set(0);
+						chessyDriveAuto(0,0);
 					}
 				}
 				else
@@ -302,7 +263,7 @@ public class Drive
 				}
 				break;
 
-			case GEAR_PLACEMENT:
+			case LEFT_GEAR_PLACEMENT:
 				if (state == State.INIT)
 				{
 					// gearArm.set(-0.5);

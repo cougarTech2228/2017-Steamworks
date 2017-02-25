@@ -83,9 +83,9 @@ public class Gear
 //		gearArmUpXbox = joystick.getRawAxis(3);
 //		gearArmDownXbox = joystick.getRawAxis(2);
 		moveGearArmUp = joystick
-				.getRawButton(RobotMap.BUTTON_1_MOVE_ARM_UP);
+				.getRawButton(RobotMap.BUTTON_4_MOVE_ARM_UP);
 		moveGearArmDown = joystick
-				.getRawButton(RobotMap.BUTTON_4_MOVE_ARM_DOWN);
+				.getRawButton(RobotMap.BUTTON_1_MOVE_ARM_DOWN);
 		if (moveGearArmUp)
 
 		{
@@ -102,13 +102,6 @@ public class Gear
 			// gearCollector.set(0);
 		} //
 
-		// dropDaGear = joystick
-		// .getRawButton(RobotMap.JOY1_BUTTON_1_DROP_THE_GEAR);
-		// if (dropDaGear)
-		// {
-		// gearArm.set(dropArm);
-		// gearCollector.set(dropRelease);
-		// }
 		SmartDashboard.putNumber("gearJaw Current", gearJaw.getOutputCurrent());
 
 	}
