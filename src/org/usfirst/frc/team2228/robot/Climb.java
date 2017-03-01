@@ -3,9 +3,12 @@ package org.usfirst.frc.team2228.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.VictorSP;
 
 public class Climb {
 	private CANTalon climberMotor;
+	private VictorSP climber;
 	private boolean newValue = false;
 	private boolean oldValue = false;
 	private boolean climberOn = false;
@@ -15,7 +18,8 @@ public class Climb {
 	public Climb(Joystick joy) {
 
 		joystick = joy;
-		climberMotor = new CANTalon(RobotMap.ROBOT_CLIMBER);
+		climberMotor = new CANTalon(/*RobotMap.ROBOT_CLIMBER*/7);
+//		climber = new VictorSP(1);
 
 	}
 
@@ -36,7 +40,7 @@ public class Climb {
 		// If percentage is 100, then it will make it 0
 		// If percentage is 0, then it will make it 100
 
-		newValue = joystick.getRawButton(RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF);
+		newValue = joystick.getRawButton(/*RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF*/8);
 
 		if (newValue != oldValue) {
 			
@@ -44,7 +48,7 @@ public class Climb {
 				
 				if (!climberOn) {
 					
-					climberMotor.set(1);
+					climberMotor.set(-1);
 					climberOn = true;
 					
 				}else {

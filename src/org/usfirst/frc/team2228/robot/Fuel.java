@@ -1,16 +1,24 @@
 package org.usfirst.frc.team2228.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel
 {
-	private Spark fuelFurnaceRoller;
-	private Spark fuelLoadStationRoller;
-	private Spark fuelConveyorRoller;
+	private VictorSP fuelFurnaceRoller;
+	private VictorSP fuelLoadStationRoller;
+	private VictorSP fuelConveyorRoller;
+	private Spark fuelGuide;
+	private DigitalInput fwdLimitSwitch;
+	private DigitalInput revLimitSwitch;
+	private double guideUpSpeed = 0.3;
+	private double guideDownSpeed = -0.3;
+	private double fuelDischargeSpeed = -1;
 	private Joystick joystick;
 	private Joystick joystick2;
 	private boolean firstConveyorValue = false;
@@ -22,24 +30,36 @@ public class Fuel
 	private boolean conveyorMotorValue = false;
 	private boolean loadStationMotorValue = false;
 	private boolean furnaceMotorValue = false;
-	private final double conveyorSpeed = 1;
+	private final double conveyorSpeed = -1;
 	private final double loadStationSpeed = 1;
 	private final double furnaceDispenserSpeed = 1;
 	private PowerDistributionPanel pdp;
 	private double theConveyorNowCurrent;
 	private double theLoadStationNowCurrent;
 	private double theFurnaceNowCurrent;
+	private boolean newValue;
+	private boolean oldValue;
+	private boolean conveyorOn;
 
 	// Constructor
 	public Fuel(Joystick joy, PowerDistributionPanel pdpCurrent)
 	{
+		newValue = false;
+		oldValue = false;
+		conveyorOn = false;
 		pdp = pdpCurrent;
 		joystick = joy;
 		// joystick2 = joy;
-		fuelFurnaceRoller = new Spark(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
-		fuelLoadStationRoller = new Spark(
-				RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
-		fuelConveyorRoller = new Spark(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
+		fuelFurnaceRoller = new VictorSP(/*RobotMap.FUEL_FURNACE_ROLLER_MOTOR*/6);
+		fuelLoadStationRoller = new VictorSP(
+				/*RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR*/5);
+		fuelConveyorRoller = new VictorSP(/*RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR*/7);
+		
+		fuelGuide = new Spark(8);
+		
+		fwdLimitSwitch = new DigitalInput(8);
+		revLimitSwitch = new DigitalInput(9);
+		
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
 		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
 		SmartDashboard.putBoolean("Furnace Roller Power", false);
@@ -170,6 +190,69 @@ public class Fuel
 
 	}
 
+	public void fuelFurnaceRollerSet(double vel){
+		
+		fuelFurnaceRoller.set(vel);
+		
+	}
+	
+	public void fuelLoadStationRollerSet(double vel){
+		
+		fuelLoadStationRoller.set(vel);
+		
+	}
+	
+	public void collectFuel(){
+		
+		fuelLoadStationRoller.set(1);
+		if(fwdLimitSwitch.get()){
+//			fuelGuide.set(guideDownSpeed);
+		}
+		
+	}
+	
+	public void guidesUp(){
+		
+		if(revLimitSwitch.get()){
+//			fuelGuide.set(guideUpSpeed);
+		}
+		
+	}
+	
+	public void dischargeFuel(){
+		
+		fuelFurnaceRoller.set(fuelDischargeSpeed);
+		
+	}
+	
+	public void collectFuelFloor(){
+		
+		
+		newValue = joystick.getRawButton(/*RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF*/9);
+
+		if (newValue != oldValue) {
+			
+			if (newValue) {
+				
+				if (!conveyorOn) {
+					
+					fuelConveyorRoller.set(conveyorSpeed);
+					conveyorOn = true;
+					
+				}else {
+					
+					fuelConveyorRoller.set(0);
+					conveyorOn = false;
+					
+				}
+
+			}
+			oldValue = newValue;
+		}
+		
+	}
+	
+	
 	// Called continuously during testing
 	public void testPeriodic()
 	{
