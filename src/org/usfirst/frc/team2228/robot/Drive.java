@@ -42,10 +42,13 @@ public class Drive {
 	private double rotateValue;
 	private double encoder;
 	private double up = -1.0;
+	private double smoothFactor;
+	private double oldEMA;
+	
 
 	final double timeoutValue = 1.08; // seconds
 	final double timeoutValueToLift = 1.1;
-
+	final int TimePeriods = 5;
 	private double timeOutValueSecondMove;
 	double visionAngle;
 	AHRS ahrs;
@@ -417,7 +420,7 @@ public class Drive {
 		// Press a button (7) to enter "chessyDrive" otherwise drive in
 		// "tankDrive"
 		// driveStyle.tankDrive(joystick1, joystick2);
-
+//4:20
 		if (gearValue > 1) {
 
 			gearValue = 1;
@@ -492,11 +495,10 @@ public class Drive {
 			counter = 0;
 
 		}
-
+		moveValue = smoothMove(moveValue);
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 
 	}
-
 	public void chessyDriveAuto(double moveValue, double rotateValue) {
 
 		if (rotateValue < 0.1 && rotateValue > -0.1) {
@@ -516,7 +518,7 @@ public class Drive {
 			}
 
 		}
-
+		moveValue = smoothMove(moveValue);
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 
 	}
@@ -653,5 +655,11 @@ public class Drive {
 			}
 			oldButtonValue = newButtonValue;
 		}
+	}
+	private double smoothMove(double moveValue){
+		smoothFactor = 2 / (TimePeriods + 1);
+		double newEMA = oldEMA + smoothFactor * (moveValue - oldEMA);
+		oldEMA = newEMA;
+		return newEMA;
 	}
 }
