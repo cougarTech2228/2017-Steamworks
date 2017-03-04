@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Gear
-{
+public class Gear {
 	private CANTalon gearArm;
 	private CANTalon gearJaw;
 	private Spark gearLoadCollectionGuide;
@@ -28,10 +27,9 @@ public class Gear
 	private double armDown = 0.2;
 	private double gearJawOpenValue = -0.3;
 	private double gearJawCloseValue = 0.3;
-	
+
 	// Constructor
-	public Gear(Joystick joy)
-	{
+	public Gear(Joystick joy) {
 
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
@@ -42,36 +40,27 @@ public class Gear
 	}
 
 	// Called once at the beginning of the autonomous period
-	public void autonomousInit()
-	{
+	public void autonomousInit() {
 
 	}
 
 	// Called continuously during the autonomous period
-	public void autonomousPeriodic()
-	{
+	public void autonomousPeriodic() {
 
 	}
 
 	// Called continuously during the teleop period
-	public void teleopPeriodic()
-	{
+	public void teleopPeriodic() {
 		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
-		gearGraspRelease = joystick
-				.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
-		if (gearCollection)
-		{
+		gearGraspRelease = joystick.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
+		if (gearCollection) {
 			// leftGearCollector.set(-0.9);
 			gearJaw.set(gearJawOpenValue);
-		}
-		else if (gearGraspRelease)
-		{
+		} else if (gearGraspRelease) {
 			// leftGearCollector.set(.9);
 
 			gearJaw.set(gearJawCloseValue);
-		}
-		else
-		{
+		} else {
 			gearJaw.set(0);
 		}
 		// else
@@ -80,23 +69,17 @@ public class Gear
 		// gearCollector.set(0);
 		// }
 
-//		gearArmUpXbox = joystick.getRawAxis(3);
-//		gearArmDownXbox = joystick.getRawAxis(2);
-		moveGearArmUp = joystick
-				.getRawButton(RobotMap.BUTTON_4_MOVE_ARM_UP);
-		moveGearArmDown = joystick
-				.getRawButton(RobotMap.BUTTON_1_MOVE_ARM_DOWN);
+		// gearArmUpXbox = joystick.getRawAxis(3);
+		// gearArmDownXbox = joystick.getRawAxis(2);
+		moveGearArmUp = joystick.getRawButton(RobotMap.BUTTON_4_MOVE_ARM_UP);
+		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_1_MOVE_ARM_DOWN);
 		if (moveGearArmUp)
 
 		{
 			gearArm.set(armUp);
-		}
-		else if (moveGearArmDown)
-		{
+		} else if (moveGearArmDown) {
 			gearArm.set(armDown);
-		}
-		else
-		{
+		} else {
 			gearArm.set(0);
 			// leftGearCollector.set(0);
 			// gearCollector.set(0);
@@ -106,19 +89,16 @@ public class Gear
 
 	}
 
-	public void gearClawSet(double vel)
-	{
+	public void gearClawSet(double vel) {
 		gearJaw.set(vel);
 	}
 
-	public void gearArmSet(double vel)
-	{
+	public void gearArmSet(double vel) {
 		gearArm.set(vel);
 	}
 
 	// Called continuously during testing
-	public void testPeriodic()
-	{
+	public void testPeriodic() {
 
 	}
 }

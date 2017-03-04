@@ -6,10 +6,8 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class Climb
-{
+public class Climb {
 	private CANTalon climberMotor;
-	private VictorSP climber;
 	private boolean newValue = false;
 	private boolean oldValue = false;
 	private boolean climberOn = false;
@@ -21,91 +19,45 @@ public class Climb
 	private Joystick joystick;
 
 	// Constructor
-	public Climb(Joystick joy, PowerDistributionPanel _pdp)
-	{
+	public Climb(Joystick joy, PowerDistributionPanel _pdp) {
 
 		joystick = joy;
 		climberMotor = new CANTalon(RobotMap.ROBOT_CLIMBER);
-		climber = new VictorSP(RobotMap.ROBOT_CLIMBER_TEST);
 		pdp = _pdp;
 
 	}
 
 	// Called once at the beginning of the autonomous period
-	public void autonomousInit()
-	{
+	public void autonomousInit() {
 
 	}
 
 	// Called continuously during the autonomous period
-	public void autonomousPeriodic()
-	{
+	public void autonomousPeriodic() {
 
 	}
 
 	// Called continuously during the teleop period
-	public void teleopPeriodic()
-	{
-		// FOR COMPETITION
-		// newValue = joystick
-		// .getRawButton(RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF);
-		//
-		// if (newValue != oldValue)
-		// {
-		//
-		// if (newValue)
-		// {
-		//
-		// if (!climberOn)
-		// {
-		//
-		// climberMotor.set(fullPower);
-		// climberOn = true;
-		//
-		// }
-		// else
-		// {
-		//
-		// climberMotor.set(noPower);
-		// climberOn = false;
-		//
-		// }
-		//
-		// }
-		// oldValue = newValue;
-		// }
-		//
-		// }
-
-		// FOR TEST BOT
-		
-		
+	public void teleopPeriodic() {
 		currentClimberCurrent = pdp.getCurrent(8);
-		SmartDashboard.putNumber("Current to the Climber",currentClimberCurrent);
+		SmartDashboard.putNumber("Current to the Climber", currentClimberCurrent);
 		newValue = joystick.getRawButton(RobotMap.BUTTON_8_CLIMB_ON_AND_OFF);
-		
-		if (maxClimberCurrent <= currentClimberCurrent)
-		{
-			climber.set(.75);
+
+		if (maxClimberCurrent <= currentClimberCurrent) {
+			climberMotor.set(.75);
 			System.out.println("Current is too high, climber is recieving less power!");
-		}
-		else if (newValue != oldValue)
-		{
+		} else if (newValue != oldValue) {
 
-			if (newValue)
-			{
+			if (newValue) {
 
-				if (!climberOn)
-				{
+				if (!climberOn) {
 
-					climber.set(fullPower);
+					climberMotor.set(fullPower);
 					climberOn = true;
 
-				}
-				else
-				{
+				} else {
 
-					climber.set(noPower);
+					climberMotor.set(noPower);
 					climberOn = false;
 
 				}
@@ -117,8 +69,7 @@ public class Climb
 	}
 
 	// Called continuously during testing
-	public void testPeriodic()
-	{
+	public void testPeriodic() {
 
 	}
 }

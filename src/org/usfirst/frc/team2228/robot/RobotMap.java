@@ -10,7 +10,7 @@ public final class RobotMap
 	// Motor ID's
 		public static int GEAR_JAW = 5;
 		public static int GEAR_ARM = 6;
-		public static int GEAR_LOAD_STATION_GUIDE = 9; //Spark 1
+		public static int GEAR_LOAD_STATION_GUIDE = 9;
 	// Button ID's
 		// Button 3 releases the gear
 		public static int BUTTON_3_RELEASE_THE_GEAR = 3;
@@ -25,10 +25,10 @@ public final class RobotMap
 		
 // Fuel
 	//  Motor IDs
-		public static int FUEL_FURNACE_ROLLER_MOTOR = 6; //VictorSP 2
-		public static int FUEL_LOAD_STATION_ROLLER_MOTOR = 5; //VictorSP 3
-		public static int FUEL_CONVEYOR_ROLLER_MOTOR = 7; //VictorSP 1
-		public static int FUEL_LOAD_STATION_GUIDE_MOTOR = 8; //Spark 2
+		public static int FUEL_FURNACE_ROLLER_MOTOR = 6;
+		public static int FUEL_LOAD_STATION_ROLLER_MOTOR = 5;
+		public static int FUEL_CONVEYOR_ROLLER_MOTOR = 7; 
+		public static int FUEL_LOAD_STATION_GUIDE_MOTOR = 8; 
 	// Button IDs
 		// Button 5 collects the fuel from the load station
 		public static int BUTTON_5_LOAD_STATION_COLLECTOR = 5;
@@ -46,7 +46,6 @@ public final class RobotMap
 // Climb
 	// Motor ID
 		public static int ROBOT_CLIMBER = 7;
-		public static int ROBOT_CLIMBER_TEST = 1; //VictorSP
 	// Button ID
 		// button 8 on joystick 2 turns the climb motor on and off
 		public static int BUTTON_8_CLIMB_ON_AND_OFF = 8;
