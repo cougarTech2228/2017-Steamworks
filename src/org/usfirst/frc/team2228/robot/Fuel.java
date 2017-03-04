@@ -105,10 +105,10 @@ public class Fuel {
 		theLoadStationNowCurrent = pdp.getCurrent(0);
 		SmartDashboard.putNumber("Fuel Load Station Current", theLoadStationNowCurrent);
 
-		if (pdp.getCurrent(0) >= ConstantMap.MAX_LOAD_STATION_CURRENT) {
-			fuelLoadStationRoller.set(0);
-			SmartDashboard.putBoolean("Fuel Load Station Emergency Shut Down", true);
-		}
+//		if (pdp.getCurrent(0) >= ConstantMap.MAX_LOAD_STATION_CURRENT) {
+//			fuelLoadStationRoller.set(0);
+//			SmartDashboard.putBoolean("Fuel Load Station Emergency Shut Down", true);
+//		}
 		// >_<
 
 		firstFurnaceValue = joystick.getRawButton(RobotMap.BUTTON_7_FURNACE_ROLLER_DISPENSER);

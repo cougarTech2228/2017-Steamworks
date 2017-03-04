@@ -13,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -28,8 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 
-public class Robot extends IterativeRobot
-{
+public class Robot extends IterativeRobot {
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	String autoSelected;
@@ -51,33 +51,41 @@ public class Robot extends IterativeRobot
 	private double centerX = 0.0;
 	private final Object imgLock = new Object();
 
+	private Servo pan;
+	private Servo tilt;
+
+	private double panAngle;
+	private double tiltAngle;
 	/*
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 
 	@Override
-	public void robotInit()
-	{
-		// chooser.addDefault("Default Auto", defaultAuto);
-		// chooser.addObject("My Auto", customAuto);
+	public void robotInit() {
 		chooser.addObject("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
-		chooser.addDefault("Base Line",
-				ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
-		chooser.addObject("Center Gear Placement",
-				ConstantMap.AutoChoices.CENTER);
-		chooser.addObject("Left Gear Placement",
-				ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
+		chooser.addDefault("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
+		chooser.addObject("Center Gear Placement", ConstantMap.AutoChoices.CENTER);
+		chooser.addObject("Left Gear Placement", ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
 		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
+		chooser.addObject("Left Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
+		chooser.addObject("Right Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+
 		SmartDashboard.putData("Auto choices", chooser);
+
+		panAngle = 90;
+		tiltAngle = 90;
 
 		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
 		pdp = new PowerDistributionPanel();
 		fuel = new Fuel(joystick, pdp);
-		drive = new Drive();
-		climb = new Climb(drive.getJoystick(), pdp);
-		gear = new Gear(joystick);
 
+		gear = new Gear(joystick);
+		drive = new Drive(joystick /* gear */);
+		climb = new Climb(joystick, pdp);
+
+		pan = new Servo(3);
+		tilt = new Servo(4);
 		SmartDashboard.putNumber("CenterX", 0);
 
 		grip = new GripPipeline();
@@ -116,13 +124,16 @@ public class Robot extends IterativeRobot
 	}
 
 	@Override
-	public void autonomousInit()
-	{
+	public void autonomousInit() {
 		choisir = chooser.getSelected();
 		drive.autonomousInit(choisir);
 
-		if (choisir == AutoChoices.DO_NOTHING)
-		{
+		if (choisir == AutoChoices.BASE_LINE_TIME_SENSOR) {
+			System.out.println("Driving to the Base Line");
+		}
+		if (choisir == AutoChoices.DO_NOTHING) {
+			// System.out.println("No Choosing 4 u");
+
 		}
 	}
 
@@ -130,35 +141,55 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during autonomous
 	 */
 	@Override
-	public void autonomousPeriodic()
-	{
+	public void autonomousPeriodic() {
 		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic(gear);
-		/*
-		 * // Put custom auto code here break; case defaultAuto: default: // Put
-		 * default auto code here break; }
-		 */
+
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
-	public void teleopPeriodic()
-	{
+	public void teleopPeriodic() {
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
+		fuel.teleopPeriodic();
 		gear.teleopPeriodic();
 
-		fuel.teleopPeriodic();
+		// fuel.teleopPeriodic();
 
 		double centerX;
-		synchronized (imgLock)
-		{
+		synchronized (imgLock) {
 			centerX = this.centerX;
 		}
 
+		if (joystick.getPOV() == 270 && panAngle < 150) {
+
+			panAngle += 1;
+
+		} else if (joystick.getPOV() == 0 && tiltAngle > 30) {
+
+			tiltAngle -= 1;
+
+		} else if (joystick.getPOV() == 90 && panAngle > 30) {
+
+			panAngle -= 1;
+
+		} else if (joystick.getPOV() == 180 && tiltAngle < 150) {
+
+			tiltAngle += 1;
+
+		}
+
+		pan.setAngle(panAngle);
+		tilt.setAngle(tiltAngle);
+
+		SmartDashboard.putNumber("POV VALUE", joystick.getPOV());
+
+		// pan.setAngle(90);
+		// tilt.setAngle(90);
 		SmartDashboard.putNumber("CenterX", centerX);
 	}
 
@@ -166,8 +197,7 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during test mode
 	 */
 	@Override
-	public void testPeriodic()
-	{
+	public void testPeriodic() {
 		LiveWindow.run();
 	}
 }
