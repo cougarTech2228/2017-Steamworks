@@ -1,6 +1,7 @@
 package org.usfirst.frc.team2228.robot;
 
-public final class ConstantMap {
+public final class ConstantMap
+{
 
 	// *Constants
 	public static final String doNothing = "Do Nothing";
@@ -10,8 +11,13 @@ public final class ConstantMap {
 	public static final double MAX_LOAD_STATION_CURRENT = 6;
 	public static final double MAX_FURNACE_CURRENT = 7;
 
-	public enum AutoChoices {
-		DO_NOTHING, BASE_LINE_TIME_SENSOR, LEFT_BLUE, RIGHT_BLUE, LEFT_RED, RIGHT_RED, CENTER, NO_VISION_GEAR_PLACEMENT
+	public static int FUEL_LOAD_STATION_IN_DIR = 1;
+	public static int FUEL_FURNACE_OUT_DIR = -1;
+
+	public enum AutoChoices
+	{
+		DO_NOTHING, BASE_LINE_TIME_SENSOR, CENTER, RIGHT_GEAR_PLACEMENT, LEFT_GEAR_PLACEMENT,
+		VISION_GEAR_LEFT, VISION_GEAR_RIGHT
 	}
 
 }

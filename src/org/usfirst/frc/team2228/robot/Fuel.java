@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel
 {
+
 	private VictorSP fuelFurnaceRoller;
 	private VictorSP fuelLoadStationRoller;
 	private VictorSP fuelConveyorRoller;
@@ -19,8 +20,8 @@ public class Fuel
 	private double guideUpSpeed = 0.3;
 	private double guideDownSpeed = -0.3;
 	private double fuelDischargeSpeed = -1;
+	
 	private Joystick joystick;
-	private Joystick joystick2;
 	private boolean firstConveyorValue = false;
 	private boolean lastConveyorValue = false;
 	private boolean firstLoadStationValue = false;
@@ -30,10 +31,12 @@ public class Fuel
 	private boolean conveyorMotorValue = false;
 	private boolean loadStationMotorValue = false;
 	private boolean furnaceMotorValue = false;
+
 	private final double conveyorSpeed = -1;
 	private final double loadStationSpeed = 1;
 	private final double furnaceDispenserSpeed = 1;
 	private PowerDistributionPanel pdp;
+
 	private double theConveyorNowCurrent;
 	private double theLoadStationNowCurrent;
 	private double theFurnaceNowCurrent;
@@ -49,16 +52,16 @@ public class Fuel
 		conveyorOn = false;
 		pdp = pdpCurrent;
 		joystick = joy;
-		// joystick2 = joy;
-		fuelFurnaceRoller = new VictorSP(/*RobotMap.FUEL_FURNACE_ROLLER_MOTOR*/6);
-		fuelLoadStationRoller = new VictorSP(
-				/*RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR*/5);
-		fuelConveyorRoller = new VictorSP(/*RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR*/7);
 		
 		fuelGuide = new Spark(8);
 		
 		fwdLimitSwitch = new DigitalInput(8);
 		revLimitSwitch = new DigitalInput(9);
+		
+		fuelFurnaceRoller = new VictorSP(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
+		fuelLoadStationRoller = new VictorSP(
+				RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
+		fuelConveyorRoller = new VictorSP(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
 		
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
 		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
@@ -80,8 +83,6 @@ public class Fuel
 	// Called continuously during the teleop period
 	public void teleopPeriodic()
 	{
-		firstConveyorValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_4_FLOOR_FUEL_COLLECTOR);
 
 		if (firstConveyorValue != lastConveyorValue)
 		{
@@ -117,7 +118,7 @@ public class Fuel
 		// >o<
 
 		firstLoadStationValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_7_LOAD_STATION_COLLECTOR);
+				.getRawButton(RobotMap.BUTTON_5_LOAD_STATION_COLLECTOR);
 
 		if (firstLoadStationValue != lastLoadStationValue)
 		{
@@ -125,7 +126,7 @@ public class Fuel
 			{
 				if (loadStationMotorValue == false)
 				{
-					fuelLoadStationRoller.set(loadStationSpeed);
+					fuelLoadStationRoller.set(testBotLoadStationSpeed);
 					SmartDashboard.putBoolean("Fuel Load Station Roller Power",
 							true);
 					loadStationMotorValue = true;
@@ -155,7 +156,7 @@ public class Fuel
 		// >_<
 
 		firstFurnaceValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_8_FURNACE_ROLLER_DISPENSER);
+				.getRawButton(RobotMap.BUTTON_7_FURNACE_ROLLER_DISPENSER);
 
 		if (firstFurnaceValue != lastFurnaceValue)
 		{
@@ -164,7 +165,7 @@ public class Fuel
 				if (furnaceMotorValue == false)
 				{
 					fuelFurnaceRoller.set(furnaceDispenserSpeed
-							* RobotMap.FUEL_FURNACE_OUT_DIR);
+							* ConstantMap.FUEL_FURNACE_OUT_DIR);
 					SmartDashboard.putBoolean("Furnace Roller Power", true);
 					furnaceMotorValue = true;
 				}
@@ -256,22 +257,6 @@ public class Fuel
 	// Called continuously during testing
 	public void testPeriodic()
 	{
-		firstConveyorValue = joystick
-				.getRawButton(RobotMap.JOY1_BUTTON_4_FLOOR_FUEL_COLLECTOR);
-
-		if (firstConveyorValue != lastConveyorValue)
-		{
-			if (firstConveyorValue == true)
-			{
-				fuelConveyorRoller.set(conveyorSpeed);
-				SmartDashboard.putBoolean("Fuel Roller Power", true);
-			}
-			else if (fuelConveyorRoller.get() == 1)
-			{
-				fuelConveyorRoller.set(0);
-				SmartDashboard.putBoolean("Fuel Roller Power", false);
-			}
-			lastConveyorValue = firstConveyorValue;
-		}
+		
 	}
 }

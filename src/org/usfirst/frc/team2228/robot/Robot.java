@@ -29,7 +29,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot
+{
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	String autoSelected;
@@ -62,16 +63,23 @@ public class Robot extends IterativeRobot {
 	 */
 
 	@Override
-	public void robotInit() {
-		// chooser.addDefault("Default Auto", defaultAuto);
-		// chooser.addObject("My Auto", customAuto);
-		chooser.addDefault("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
-		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
-		chooser.addObject("Left Blue Gear Placement", ConstantMap.AutoChoices.LEFT_BLUE);
-		chooser.addObject("Right Blue Gear Placement", ConstantMap.AutoChoices.RIGHT_BLUE);
-		chooser.addObject("Left Red Gear Placement", ConstantMap.AutoChoices.LEFT_RED);
-		chooser.addObject("Right Red Gear Placement", ConstantMap.AutoChoices.RIGHT_RED);
-		chooser.addObject("No Vision Gear Placement", ConstantMap.AutoChoices.NO_VISION_GEAR_PLACEMENT);
+	public void robotInit()
+	{
+
+		chooser.addObject("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
+		chooser.addDefault("Base Line",
+				ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
+		chooser.addObject("Center Gear Placement",
+				ConstantMap.AutoChoices.CENTER);
+		chooser.addObject("Left Gear Placement",
+				ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
+		chooser.addObject("Right Gear Placement", 
+				ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
+		chooser.addObject("Left Gear w/vision",
+				ConstantMap.AutoChoices.VISION_GEAR_LEFT);
+		chooser.addObject("Right Gear w/vision", 
+				ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+
 		SmartDashboard.putData("Auto choices", chooser);
 		
 		panAngle = 90;
@@ -81,11 +89,11 @@ public class Robot extends IterativeRobot {
 		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
 		pdp = new PowerDistributionPanel();
 		fuel = new Fuel(joystick, pdp);
+
 		gear = new Gear(joystick);
 		drive = new Drive(gear, joystick);
-		climb = new Climb(joystick);
-		
-		
+		climb = new Climb(joystick, pdp);
+
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
 		// SmartDashboard.putString("autonomous selection",
 		// ConstantMap.doNothing);
@@ -94,67 +102,64 @@ public class Robot extends IterativeRobot {
 		 tilt = new Servo(4);
 		SmartDashboard.putNumber("CenterX", 0);
 
-		grip = new GripPipeline();
-
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-
-		visionThread = new VisionThread(camera, grip, grip -> {
-			if (!grip.filterContoursOutput().isEmpty()) {
-				ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
-				ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
-				for (MatOfPoint point : contours) {
-					double expectedRation = 2.54;
-					double tolerance = 2;
-					Rect r = Imgproc.boundingRect(point);
-					double ration = r.height / r.width;
-
-					if (ration < expectedRation + tolerance && ration > expectedRation - tolerance) {
-						targets.add(point);
-					}
-				}
-
-				if (targets.size() == 2) {
-					Rect r = Imgproc.boundingRect(grip.filterContoursOutput().get(0));
-
-					Rect q = Imgproc.boundingRect(grip.filterContoursOutput().get(1));
-					synchronized (imgLock) {
-						centerX = (r.x + (r.width / 2) + q.x + (q.width / 2)) / 2.0;
-					}
-				}
-				SmartDashboard.putNumber("CenterX", centerX);
-			}
-		});
-		visionThread.start();
+		// grip = new GripPipeline();
+		//
+		// UsbCamera camera =
+		// CameraServer.getInstance().startAutomaticCapture();
+		// camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		//
+		// visionThread = new VisionThread(camera, grip, grip ->
+		// {
+		// if (!grip.filterContoursOutput().isEmpty())
+		// {
+		// ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
+		// ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
+		// for (MatOfPoint point : contours)
+		// {
+		// double expectedRation = 2.54;
+		// double tolerance = 2;
+		// Rect r = Imgproc.boundingRect(point);
+		// double ration = r.height / r.width;
+		//
+		// if (ration < expectedRation + tolerance
+		// && ration > expectedRation - tolerance)
+		// {
+		// targets.add(point);
+		// }
+		// }
+		//
+		// if (targets.size() == 2)
+		// {
+		// Rect r = Imgproc
+		// .boundingRect(grip.filterContoursOutput().get(0));
+		//
+		// Rect q = Imgproc
+		// .boundingRect(grip.filterContoursOutput().get(1));
+		// synchronized (imgLock)
+		// {
+		// centerX = (r.x + (r.width / 2) + q.x + (q.width / 2))
+		// / 2.0;
+		// }
+		// }
+		// SmartDashboard.putNumber("CenterX", centerX);
+		// }
+		// });
+		// visionThread.start();
 
 	}
 
-	/*
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
 	@Override
-	public void autonomousInit() {
+	public void autonomousInit()
+	{
 		choisir = chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		// autoSelected = SmartDashboard.getString("autonomous selection",
-		// ConstantMap.doNothing);
 		drive.autonomousInit(choisir);
 
-		// System.out.println(autoSelected);
 		if (choisir == AutoChoices.BASE_LINE_TIME_SENSOR) {
 			System.out.println("Driving to the Base Line");
 		}
 		if (choisir == AutoChoices.DO_NOTHING) {
 			// System.out.println("No Choosing 4 u");
+
 		}
 	}
 
@@ -162,30 +167,31 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during autonomous
 	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic()
+	{
 		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic(gear);
-		/*
-		 * // Put custom auto code here break; case defaultAuto: default: // Put
-		 * default auto code here break; }
-		 */
+		
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
-	public void teleopPeriodic() {
+	public void teleopPeriodic()
+	{
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
+		fuel.teleopPeriodic();
 		gear.teleopPeriodic(fuel);
 
 		
 //		fuel.teleopPeriodic();
 
 		double centerX;
-		synchronized (imgLock) {
+		synchronized (imgLock)
+		{
 			centerX = this.centerX;
 		}
 		
@@ -237,7 +243,8 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during test mode
 	 */
 	@Override
-	public void testPeriodic() {
+	public void testPeriodic()
+	{
 		LiveWindow.run();
 	}
 }
