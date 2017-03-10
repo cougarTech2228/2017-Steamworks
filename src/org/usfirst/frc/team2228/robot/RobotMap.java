@@ -17,11 +17,11 @@ public final class RobotMap {
 		// Button 2 collects the gear
 		public static int BUTTON_2_COLLECT_THE_GEAR = 3;
 		// Button 4 moves the arm down
-		public static int BUTTON_1_MOVE_ARM_DOWN = 5;
+		public static int BUTTON_5_MOVE_ARM_DOWN = 5;
 		// Button 1 moves the arm up
-		public static int BUTTON_4_MOVE_ARM_UP = 6;
+		public static int BUTTON_6_MOVE_ARM_UP = 6;
 		// Button 6 lets the robot collect the gear from the load station
-		public static int BUTTON_6_GEAR_COLLECTION = 6;
+		public static int BUTTON_1_GEAR_COLLECTION = 1;
 		
 // Fuel
 	//  Motor IDs
@@ -32,9 +32,11 @@ public final class RobotMap {
 	// Button IDs
 
 		// Button 5 collects the fuel from the load station
-		public static int BUTTON_5_LOAD_STATION_COLLECTOR = 5;
+		public static int BUTTON_4_LOAD_STATION_COLLECTOR = 4;
 		// Button 7 dispenses the fuel into the furnace
 		public static int BUTTON_7_FURNACE_ROLLER_DISPENSER = 7;
+		// Button 10 (clicking the right stick) turns the floor fuel collector on and off
+		public static int BUTTON_10_FLOOR_FUEL_COLLECTOR = 10;
 
 // Drive
 	// CANTalon ID's
@@ -58,5 +60,4 @@ public final class RobotMap {
 	public static int BUTTON_8_CLIMB_ON_AND_OFF = 8;
 	
 
-	// public static
 }

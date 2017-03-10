@@ -64,12 +64,13 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		chooser.addObject("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
-		chooser.addDefault("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
-		chooser.addObject("Center Gear Placement", ConstantMap.AutoChoices.CENTER);
+		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
 		chooser.addObject("Left Gear Placement", ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
 		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
 		chooser.addObject("Left Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
 		chooser.addObject("Right Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+		chooser.addDefault("Center Gear Vision", ConstantMap.AutoChoices.CENTER_GEAR_PLACEMENT);
+		chooser.addDefault("Center", ConstantMap.AutoChoices.CENTER);
 
 		SmartDashboard.putData("Auto choices", chooser);
 
@@ -81,7 +82,7 @@ public class Robot extends IterativeRobot {
 		fuel = new Fuel(joystick, pdp);
 
 		gear = new Gear(joystick);
-		drive = new Drive(joystick /* gear */);
+		drive = new Drive(joystick, gear);
 		climb = new Climb(joystick, pdp);
 
 		pan = new Servo(3);
