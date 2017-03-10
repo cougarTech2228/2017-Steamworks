@@ -29,8 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 
-public class Robot extends IterativeRobot
-{
+public class Robot extends IterativeRobot {
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
 	String autoSelected;
@@ -54,7 +53,7 @@ public class Robot extends IterativeRobot
 
 	private Servo pan;
 	private Servo tilt;
-	
+
 	private double panAngle;
 	private double tiltAngle;
 	/*
@@ -63,94 +62,70 @@ public class Robot extends IterativeRobot
 	 */
 
 	@Override
-	public void robotInit()
-	{
-
+	public void robotInit() {
 		chooser.addObject("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
-		chooser.addDefault("Base Line",
-				ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
-		chooser.addObject("Center Gear Placement",
-				ConstantMap.AutoChoices.CENTER);
-		chooser.addObject("Left Gear Placement",
-				ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
-		chooser.addObject("Right Gear Placement", 
-				ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
-		chooser.addObject("Left Gear w/vision",
-				ConstantMap.AutoChoices.VISION_GEAR_LEFT);
-		chooser.addObject("Right Gear w/vision", 
-				ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
+		chooser.addObject("Left Gear Placement", ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
+		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
+		chooser.addObject("Left Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
+		chooser.addObject("Right Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+		chooser.addDefault("Center Gear Vision", ConstantMap.AutoChoices.CENTER_GEAR_PLACEMENT);
+		chooser.addDefault("Center", ConstantMap.AutoChoices.CENTER);
 
 		SmartDashboard.putData("Auto choices", chooser);
-		
+
 		panAngle = 90;
 		tiltAngle = 90;
 
-		
 		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
 		pdp = new PowerDistributionPanel();
 		fuel = new Fuel(joystick, pdp);
 
 		gear = new Gear(joystick);
-		drive = new Drive(gear, joystick);
+		drive = new Drive(joystick, gear);
 		climb = new Climb(joystick, pdp);
 
-		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
-		// SmartDashboard.putString("autonomous selection",
-		// ConstantMap.doNothing);
-
-		 pan = new Servo(3);
-		 tilt = new Servo(4);
+		pan = new Servo(3);
+		tilt = new Servo(4);
 		SmartDashboard.putNumber("CenterX", 0);
 
-		// grip = new GripPipeline();
-		//
-		// UsbCamera camera =
-		// CameraServer.getInstance().startAutomaticCapture();
-		// camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-		//
-		// visionThread = new VisionThread(camera, grip, grip ->
-		// {
-		// if (!grip.filterContoursOutput().isEmpty())
-		// {
-		// ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
-		// ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
-		// for (MatOfPoint point : contours)
-		// {
-		// double expectedRation = 2.54;
-		// double tolerance = 2;
-		// Rect r = Imgproc.boundingRect(point);
-		// double ration = r.height / r.width;
-		//
-		// if (ration < expectedRation + tolerance
-		// && ration > expectedRation - tolerance)
-		// {
-		// targets.add(point);
-		// }
-		// }
-		//
-		// if (targets.size() == 2)
-		// {
-		// Rect r = Imgproc
-		// .boundingRect(grip.filterContoursOutput().get(0));
-		//
-		// Rect q = Imgproc
-		// .boundingRect(grip.filterContoursOutput().get(1));
-		// synchronized (imgLock)
-		// {
-		// centerX = (r.x + (r.width / 2) + q.x + (q.width / 2))
-		// / 2.0;
-		// }
-		// }
-		// SmartDashboard.putNumber("CenterX", centerX);
-		// }
-		// });
-		// visionThread.start();
+		grip = new GripPipeline();
+
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+
+		visionThread = new VisionThread(camera, grip, grip -> {
+			if (!grip.filterContoursOutput().isEmpty()) {
+				ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
+				ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
+				for (MatOfPoint point : contours) {
+					double expectedRation = 2.54;
+					double tolerance = 2;
+					Rect r = Imgproc.boundingRect(point);
+					double ration = r.height / r.width;
+
+					if (ration < expectedRation + tolerance && ration > expectedRation - tolerance) {
+						targets.add(point);
+					}
+				}
+
+				if (targets.size() == 2) {
+					Rect r = Imgproc.boundingRect(grip.filterContoursOutput().get(0));
+
+					Rect q = Imgproc.boundingRect(grip.filterContoursOutput().get(1));
+					synchronized (imgLock) {
+						centerX = (r.x + (r.width / 2) + q.x + (q.width / 2)) / 2.0;
+					}
+				}
+				SmartDashboard.putNumber("CenterX", centerX);
+			}
+		});
+		visionThread.start();
 
 	}
 
 	@Override
-	public void autonomousInit()
-	{
+	public void autonomousInit() {
 		choisir = chooser.getSelected();
 		drive.autonomousInit(choisir);
 
@@ -167,71 +142,51 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during autonomous
 	 */
 	@Override
-	public void autonomousPeriodic()
-	{
+	public void autonomousPeriodic() {
 		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic(gear);
-		
+
 	}
 
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
-	public void teleopPeriodic()
-	{
+	public void teleopPeriodic() {
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
 		fuel.teleopPeriodic();
-		gear.teleopPeriodic(fuel);
+		gear.teleopPeriodic();
 
-		
-//		fuel.teleopPeriodic();
+		// fuel.teleopPeriodic();
 
 		double centerX;
-		synchronized (imgLock)
-		{
+		synchronized (imgLock) {
 			centerX = this.centerX;
 		}
-		
-		if(joystick.getRawButton(5)){
-			fuel.collectFuel();
-		}else if(!gear.loadingGear()){
-			fuel.fuelLoadStationRollerSet(0);
-		}
-		
-		if(joystick.getRawButton(7)){
-			fuel.dischargeFuel();
-		}else{
-			fuel.fuelFurnaceRollerSet(0);
-		}
-		
-		fuel.collectFuelFloor();
-		
-		
-		if(joystick.getPOV()==270 && panAngle < 150){
-			
-			panAngle+=1;
-			
-		}else if(joystick.getPOV()==0 && tiltAngle > 30){
-			
-			tiltAngle-=1;
-			
-		}else if(joystick.getPOV()==90 && panAngle > 30){
-			
+
+		if (joystick.getPOV() == 270 && panAngle < 150) {
+
+			panAngle += 1;
+
+		} else if (joystick.getPOV() == 0 && tiltAngle > 30) {
+
+			tiltAngle -= 1;
+
+		} else if (joystick.getPOV() == 90 && panAngle > 30) {
+
 			panAngle -= 1;
-			
-		}else if(joystick.getPOV()==180 && tiltAngle < 150){
-			
-			tiltAngle+=1;
-			
+
+		} else if (joystick.getPOV() == 180 && tiltAngle < 150) {
+
+			tiltAngle += 1;
+
 		}
-		
+
 		pan.setAngle(panAngle);
 		tilt.setAngle(tiltAngle);
-		
-		
+
 		SmartDashboard.putNumber("POV VALUE", joystick.getPOV());
 
 		// pan.setAngle(90);
@@ -243,8 +198,7 @@ public class Robot extends IterativeRobot
 	 * This function is called periodically during test mode
 	 */
 	@Override
-	public void testPeriodic()
-	{
+	public void testPeriodic() {
 		LiveWindow.run();
 	}
 }
