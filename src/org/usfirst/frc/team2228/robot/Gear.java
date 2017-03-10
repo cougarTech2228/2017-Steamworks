@@ -1,8 +1,11 @@
 package org.usfirst.frc.team2228.robot;
 
 import com.ctre.CANTalon;
-import edu.wpi.first.wpilibj.Joystick;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Gear
@@ -14,7 +17,8 @@ public class Gear
 	private boolean moveGearArmUp = false;
 	private boolean moveGearArmDown = false;
 	private boolean gearGraspRelease = false;
-	private Joystick joystick;
+
+	private XboxController xbox;
 	private double gearArmDownXbox;
 	private double gearArmUpXbox;
 	private boolean dropDaGear = false;
@@ -28,17 +32,26 @@ public class Gear
 	private double armDown = 0.2;
 	private double gearJawOpenValue = -0.3;
 	private double gearJawCloseValue = 0.3;
+	private CANTalon motor;
+	private DigitalInput up;
+	private DigitalInput down;
+	private boolean aleronUp = false;
+	private boolean aleronDown = false;
 	
 	// Constructor
-	public Gear(Joystick joy)
+	public Gear(XboxController xbox)
 	{
 
-		joystick = joy;
+		xbox = xbox;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
 		// leftGearCollector = new CANTalon(RobotMap.LEFT_GEAR_COLLECTOR);
 		gearJaw = new CANTalon(RobotMap.GEAR_JAW);
 		gearLoadCollectionGuide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
+		up = new DigitalInput(0);
+		down = new DigitalInput(1);
+		motor = new CANTalon(2);
 
+		
 	}
 
 	// Called once at the beginning of the autonomous period
@@ -56,9 +69,8 @@ public class Gear
 	// Called continuously during the teleop period
 	public void teleopPeriodic()
 	{
-		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
-		gearGraspRelease = joystick
-				.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
+		gearCollection = RobotMap.BUTTON_TWO;
+		gearGraspRelease = RobotMap.BUTTON_THREE;
 		if (gearCollection)
 		{
 			// leftGearCollector.set(-0.9);
@@ -80,12 +92,10 @@ public class Gear
 		// gearCollector.set(0);
 		// }
 
-//		gearArmUpXbox = joystick.getRawAxis(3);
-//		gearArmDownXbox = joystick.getRawAxis(2);
-		moveGearArmUp = joystick
-				.getRawButton(RobotMap.BUTTON_4_MOVE_ARM_UP);
-		moveGearArmDown = joystick
-				.getRawButton(RobotMap.BUTTON_1_MOVE_ARM_DOWN);
+//		gearArmUpXbox = xbox.getRawAxis(3);
+//		gearArmDownXbox = xbox.getRawAxis(2);
+		moveGearArmUp = RobotMap.BUTTON_FOUR;
+		moveGearArmDown = RobotMap.BUTTON_ONE;
 		if (moveGearArmUp)
 
 		{
@@ -103,7 +113,9 @@ public class Gear
 		} //
 
 		SmartDashboard.putNumber("gearJaw Current", gearJaw.getOutputCurrent());
-
+		if(up.get() == false){
+			
+		}
 	}
 
 	public void gearClawSet(double vel)

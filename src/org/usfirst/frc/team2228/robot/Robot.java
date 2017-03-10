@@ -13,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -35,12 +36,12 @@ public class Robot extends IterativeRobot
 	String autoSelected;
 	private AutoChoices choisir;
 	// Carrying the classes from this project's library
-	private Joystick joystick;
+	private XboxController xbox;
 	private Gear gear;
 	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-
+	private roBoxCode roBox;
 	private PowerDistributionPanel pdp;
 
 	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();
@@ -71,12 +72,13 @@ public class Robot extends IterativeRobot
 		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
 		SmartDashboard.putData("Auto choices", chooser);
 
-		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
+		xbox = new XboxController(1);
 		pdp = new PowerDistributionPanel();
-		fuel = new Fuel(joystick, pdp);
+		fuel = new Fuel(xbox, pdp);
 		drive = new Drive();
 		climb = new Climb(drive.getJoystick(), pdp);
-		gear = new Gear(joystick);
+		gear = new Gear(xbox);
+		
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
 		// SmartDashboard.putString("autonomous selection",
 		// ConstantMap.doNothing);
@@ -182,6 +184,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void testPeriodic()
 	{
+		
 		LiveWindow.run();
 	}
 }

@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel
 {
-	private Joystick joystick;
-	private Joystick joystick2;
+	private XboxController xbox;
 	private PowerDistributionPanel pdp;
 	private VictorSP fuelFurnaceRoller;
 	private VictorSP fuelLoadStationRoller;
@@ -36,10 +36,10 @@ public class Fuel
 	private double theFurnaceNowCurrent;
 
 	// Constructor
-	public Fuel(Joystick joy, PowerDistributionPanel pdpCurrent)
+	public Fuel(XboxController xbox, PowerDistributionPanel pdpCurrent)
 	{
 		pdp = pdpCurrent;
-		joystick = joy;
+		xbox = xbox;
 		// joystick2 = joy;
 		fuelFurnaceRoller = new VictorSP(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
 		fuelLoadStationRoller = new VictorSP(
@@ -99,8 +99,7 @@ public class Fuel
 		}
 		// >o<
 
-		firstLoadStationValue = joystick
-				.getRawButton(RobotMap.BUTTON_5_LOAD_STATION_COLLECTOR);
+		firstLoadStationValue =(RobotMap.BUTTON_FIVE);
 
 		if (firstLoadStationValue != lastLoadStationValue)
 		{
@@ -137,8 +136,7 @@ public class Fuel
 		}
 		// >_<
 
-		firstFurnaceValue = joystick
-				.getRawButton(RobotMap.BUTTON_7_FURNACE_ROLLER_DISPENSER);
+		firstFurnaceValue = RobotMap.BUTTON_SEVEN;
 
 		if (firstFurnaceValue != lastFurnaceValue)
 		{
