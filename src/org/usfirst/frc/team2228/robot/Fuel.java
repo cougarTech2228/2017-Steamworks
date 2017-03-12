@@ -1,5 +1,6 @@
 package org.usfirst.frc.team2228.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
@@ -8,6 +9,7 @@ import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel {
+	private Spark guide;
 	private Joystick joystick;
 	private Joystick joystick2;
 	private PowerDistributionPanel pdp;
@@ -32,6 +34,8 @@ public class Fuel {
 	private double theConveyorNowCurrent;
 	private double theLoadStationNowCurrent;
 	private double theFurnaceNowCurrent;
+	private DigitalInput fwdLimitSwitch;
+	private DigitalInput revLimitSwitch;
 
 	// Constructor
 	public Fuel(Joystick joy, PowerDistributionPanel pdpCurrent) {
@@ -44,6 +48,9 @@ public class Fuel {
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
 		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
 		SmartDashboard.putBoolean("Furnace Roller Power", false);
+		guide = new Spark(RobotMap.FUEL_LOAD_STATION_GUIDE_MOTOR);
+		fwdLimitSwitch = new DigitalInput(6);
+		revLimitSwitch = new DigitalInput(7);
 	}
 
 	// Called once at the beginning of the autonomous period
@@ -153,5 +160,12 @@ public class Fuel {
 			}
 			lastConveyorValue = firstConveyorValue;
 		}
+	}
+
+	public void fuelLoadStationRollerSet(double rollerVelocity)
+	{
+		
+		fuelLoadStationRoller.set(rollerVelocity);
+		
 	}
 }
