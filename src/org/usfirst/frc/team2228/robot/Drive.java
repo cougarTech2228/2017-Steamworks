@@ -23,17 +23,12 @@ import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 
 public class Drive {
 	private RobotDrive driveStyle;
-	private XboxController xbox;
-	private double leftJoystickX = xbox.getX(RobotMap.leftHand);
-	private double leftJoystickY = xbox.getY(RobotMap.leftHand);
-	private double rightJoystickX = xbox.getX(RobotMap.rightHand);
-	private double rightJoystickY = xbox.getX(RobotMap.rightHand);
-
 	private CANTalon right1;
 	private CANTalon left1;
 	private CANTalon right2;
 	private CANTalon left2;
 	private Gear gear;
+	private XboxIF xbox;
 	// private VictorSP gearArm;
 	// private VictorSP gearJaw;
 	private boolean newButtonValue = false;
@@ -103,7 +98,7 @@ public class Drive {
 	public State state;
 
 	// Constructor
-	public Drive() {
+	public Drive(XboxIF xbox) {
 		// "Creating" the objects
 		// Create the four motor controller objects for the drive base
 		right1 = new CANTalon(RobotMap.RIGHT_ONE_DRIVE); // 2
@@ -117,7 +112,8 @@ public class Drive {
 		gearValue = .1;
 		pressed = false;
 		// creating a gear system
-		xbox = new XboxController(1);
+
+		xbox = new XboxIF(1);
 
 		// Create the RobotDrive object
 		driveStyle = new RobotDrive(right1, left1);
@@ -330,9 +326,9 @@ public class Drive {
 		// "tankDrive"
 		// driveStyle.tankDrive(joystick1, joystick2);
 
-		speedIncreaseXbox = xbox.getRawAxis(3);
+		speedIncreaseXbox = xbox.getSpeedIncrease();
 		System.out.println(speedIncreaseXbox);
-		speedDecreaseXbox = xbox.getRawAxis(2);
+		speedDecreaseXbox = xbox.getSpeedDecrease();
 
 		if (gearValue > 1) {
 
@@ -360,17 +356,17 @@ public class Drive {
 			pressed = false;
 		}
 
-		changeDriveStyle();
-		if (driveType == false) {
-			chessyDrive(xbox);
-			SmartDashboard.putString("Driving Mode", "ChessyDrive");
-		} else {
-			driveStyle.tankDrive(leftJoystickY, rightJoystickX);
-
-			SmartDashboard.putString("Driving Mode", "TankDrive");
-		}
-		SmartDashboard.putNumber("Left Encoder Counts", left1.getPosition());
-		SmartDashboard.putNumber("Right Encoder Counts", right1.getPosition());
+//		changeDriveStyle();
+//		if (driveType == false) {
+//			chessyDrive(xbox);
+//			SmartDashboard.putString("Driving Mode", "ChessyDrive");
+//		} else {
+//			driveStyle.tankDrive(xbox.leftStickY(), xbox.rightStickY());
+//
+//			SmartDashboard.putString("Driving Mode", "TankDrive");
+//		}
+//		SmartDashboard.putNumber("Left Encoder Counts", left1.getPosition());
+//		SmartDashboard.putNumber("Right Encoder Counts", right1.getPosition());
 
 	}
 
@@ -378,18 +374,14 @@ public class Drive {
 
 	}
 
-	public double getJoystick() {
-		return rightJoystickY;
-	}
-
-	public void chessyDrive(XboxController xboxController) {
+	public void chessyDrive(XboxIF xbox2) {
 
 		SmartDashboard.putNumber("ANGLE NAVX", ahrs.getAngle());
 		// double moveValue = (leftJoystick.getRawAxis(1) * gearValue);
 		// double rotateValue = (leftJoystick.getRawAxis(4) * -1) * gearValue;
 
-		double moveValue = (xboxController.getY(RobotMap.leftHand) * gearValue);
-		double rotateValue = (xboxController.getY(RobotMap.rightHand) * -1) * gearValue;
+		double moveValue = ((xbox2.leftStickY()) * gearValue);
+		double rotateValue = (xbox2.rightStickX() * -1) * gearValue;
 
 		if (rotateValue < 0.1 && rotateValue > -0.1 && counter > 20) {
 
@@ -555,21 +547,22 @@ public class Drive {
 		return false;
 	}
 
-	private void changeDriveStyle() {
-		newButtonValue = xbox.getRawButton(7);
-
-		if (newButtonValue != oldButtonValue) {
-			if (newButtonValue == true) {
-				if (driveType == false) {
-					// driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
-					driveType = true;
-				} else {
-					// driveStyle.tankDrive(joystick1, joystick2);
-					driveType = false;
-				}
-
-			}
-			oldButtonValue = newButtonValue;
-		}
-	}
+//	private void changeDriveStyle() {
+//		boolean toggle = false;
+//		newButtonValue = xbox.getReleaseFuelButton(toggle);
+//
+//		if (newButtonValue != oldButtonValue) {
+//			if (newButtonValue == true) {
+//				if (driveType == false) {
+//					// driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
+//					driveType = true;
+//				} else {
+//					// driveStyle.tankDrive(joystick1, joystick2);
+//					driveType = false;
+//				}
+//
+//			}
+//			oldButtonValue = newButtonValue;
+//		}
+//	}
 }

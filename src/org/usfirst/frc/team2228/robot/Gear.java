@@ -18,7 +18,7 @@ public class Gear
 	private boolean moveGearArmDown = false;
 	private boolean gearGraspRelease = false;
 
-	private XboxController xbox;
+	private XboxIF xbox;
 	private double gearArmDownXbox;
 	private double gearArmUpXbox;
 	private boolean dropDaGear = false;
@@ -39,7 +39,7 @@ public class Gear
 	private boolean aleronDown = false;
 	
 	// Constructor
-	public Gear(XboxController xbox)
+	public Gear(XboxIF xbox)
 	{
 
 		xbox = xbox;

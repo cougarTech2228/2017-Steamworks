@@ -36,12 +36,12 @@ public class Robot extends IterativeRobot
 	String autoSelected;
 	private AutoChoices choisir;
 	// Carrying the classes from this project's library
-	private XboxController xbox;
+	private XboxIF xbox;
 	private Gear gear;
 	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-	private roBoxCode roBox;
+	
 	private PowerDistributionPanel pdp;
 
 	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();
@@ -57,7 +57,6 @@ public class Robot extends IterativeRobot
 	 * used for any initialization code.
 	 */
 
-	@Override
 	public void robotInit()
 	{
 		// chooser.addDefault("Default Auto", defaultAuto);
@@ -72,11 +71,11 @@ public class Robot extends IterativeRobot
 		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
 		SmartDashboard.putData("Auto choices", chooser);
 
-		xbox = new XboxController(1);
+		xbox = new XboxIF(1);
 		pdp = new PowerDistributionPanel();
 		fuel = new Fuel(xbox, pdp);
-		drive = new Drive();
-		climb = new Climb(drive.getJoystick(), pdp);
+		drive = new Drive(xbox);
+		climb = new Climb(xbox, pdp);
 		gear = new Gear(xbox);
 		
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
@@ -85,49 +84,49 @@ public class Robot extends IterativeRobot
 
 		SmartDashboard.putNumber("CenterX", 0);
 
-		// grip = new GripPipeline();
+		 grip = new GripPipeline();
 		//
-		// UsbCamera camera =
-		// CameraServer.getInstance().startAutomaticCapture();
-		// camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-		//
-		// visionThread = new VisionThread(camera, grip, grip ->
-		// {
-		// if (!grip.filterContoursOutput().isEmpty())
-		// {
-		// ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
-		// ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
-		// for (MatOfPoint point : contours)
-		// {
-		// double expectedRation = 2.54;
-		// double tolerance = 2;
-		// Rect r = Imgproc.boundingRect(point);
-		// double ration = r.height / r.width;
-		//
-		// if (ration < expectedRation + tolerance
-		// && ration > expectedRation - tolerance)
-		// {
-		// targets.add(point);
-		// }
-		// }
-		//
-		// if (targets.size() == 2)
-		// {
-		// Rect r = Imgproc
-		// .boundingRect(grip.filterContoursOutput().get(0));
-		//
-		// Rect q = Imgproc
-		// .boundingRect(grip.filterContoursOutput().get(1));
-		// synchronized (imgLock)
-		// {
-		// centerX = (r.x + (r.width / 2) + q.x + (q.width / 2))
-		// / 2.0;
-		// }
-		// }
-		// SmartDashboard.putNumber("CenterX", centerX);
-		// }
-		// });
-		// visionThread.start();
+		 UsbCamera camera =
+		 CameraServer.getInstance().startAutomaticCapture();
+		 camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+		
+		 visionThread = new VisionThread(camera, grip, grip ->
+		 {
+		 if (!grip.filterContoursOutput().isEmpty())
+		 {
+		 ArrayList<MatOfPoint> contours = grip.filterContoursOutput();
+		 ArrayList<MatOfPoint> targets = new ArrayList<MatOfPoint>();
+		 for (MatOfPoint point : contours)
+		 {
+		 double expectedRation = 2.54;
+		 double tolerance = 2;
+		 Rect r = Imgproc.boundingRect(point);
+		 double ration = r.height / r.width;
+		
+		 if (ration < expectedRation + tolerance
+		 && ration > expectedRation - tolerance)
+		 {
+		 targets.add(point);
+		 }
+		 }
+		
+		 if (targets.size() == 2)
+		 {
+		 Rect r = Imgproc
+		 .boundingRect(grip.filterContoursOutput().get(0));
+		
+		 Rect q = Imgproc
+		 .boundingRect(grip.filterContoursOutput().get(1));
+		 synchronized (imgLock)
+		 {
+		 centerX = (r.x + (r.width / 2) + q.x + (q.width / 2))
+		 / 2.0;
+		 }
+		 }
+		 SmartDashboard.putNumber("CenterX", centerX);
+		 }
+		 });
+		 visionThread.start();
 
 	}
 

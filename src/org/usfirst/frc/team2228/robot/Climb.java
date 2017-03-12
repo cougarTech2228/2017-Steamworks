@@ -18,11 +18,10 @@ public class Climb {
 	private PowerDistributionPanel pdp;
 	private int fullPower = -1;
 	private int noPower = 0;
-	private Joystick joystick;
-	private XboxController xbox;
+	private XboxIF xbox;
 
 	// Constructor
-	public Climb(XboxController xbox, PowerDistributionPanel _pdp) {
+	public Climb(XboxIF xbox, PowerDistributionPanel _pdp) {
 
 		climberMotor = new CANTalon(RobotMap.ROBOT_CLIMBER);
 		climber = new VictorSP(RobotMap.ROBOT_CLIMBER_TEST);
