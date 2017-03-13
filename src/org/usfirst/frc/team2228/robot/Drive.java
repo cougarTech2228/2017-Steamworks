@@ -49,8 +49,8 @@ public class Drive {
 	private double speedDecreaseXbox;
 	private double speedIncrease = 0.1;
 	private double speedDecrease = 0.1;
-	private double rotateIncrease = 0.22;
-	private double rotateDecrease = 0.22;
+	private double rotateIncrease = 0.24;
+	private double rotateDecrease = 0.24;
 	private double timeOutValueSecondMove;
 	// final int testBotRightEncoder = 4900;
 	// final int testBotLeftEncoder = -3200; what was on lambda
@@ -110,21 +110,26 @@ public class Drive {
 		speedByTime = -0.33;
 		rotateValue = 0;
 
+		
 		try {
 			ahrs = new AHRS(SPI.Port.kOnboardCS0);
 		} catch (RuntimeException ex) {
 			System.out.println("Error starting the Nav-X");
 		}
-		// ahrs.zeroYaw();
+		 ahrs.zeroYaw();
 	}
 
 	// Called once at the beginning of the autonomous period
 	public void autonomousInit(AutoChoices autoSelected) {
 
-		currentAngle = ahrs.getYaw();
+		ahrs.zeroYaw();
+		
+		
+//		currentAngle = ahrs.getYaw();
 		System.out.println("We are in AutoInit");
 		right1.setPosition(0);
 		left1.setPosition(0);
+		
 
 		switch (autoSelected) {
 
@@ -211,6 +216,7 @@ public class Drive {
 
 		case BASE_LINE:
 			if (state == State.INIT) {
+				
 				gear.gearArmSet(-0.5);
 				state = State.WAIT_FOR_TIME;
 				startTime = Timer.getFPGATimestamp();
@@ -325,7 +331,7 @@ public class Drive {
 		case GEAR_PLACEMENT_DREAM:
 
 			if (state == State.INIT) {
-				ahrs.zeroYaw();
+//				ahrs.zeroYaw();
 				state = State.WAIT_FOR_TIME;
 				startTime = Timer.getFPGATimestamp();
 				System.out.println("Start:");
@@ -362,6 +368,7 @@ public class Drive {
 						visionAngle = ahrs.getAngle();
 						state = State.MOVE_TO_LIFT;
 						startTime = Timer.getFPGATimestamp();
+						left1.setPosition(0);
 
 					}
 					System.out.println("NOT PROBLEM");
@@ -372,7 +379,7 @@ public class Drive {
 
 			} else if (state == State.MOVE_TO_LIFT) {
 
-				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove) || left1.getPosition() > 5177)
+				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove))
 
 				{
 					right1.set(0);
@@ -386,7 +393,7 @@ public class Drive {
 				}
 
 			} else if (state == State.PLACE_GEAR) {
-				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove)) {
+				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove*2)) {
 
 					startTime = Timer.getFPGATimestamp();
 					state = State.BACK_UP;
@@ -394,7 +401,6 @@ public class Drive {
 				} else if (Timer.getFPGATimestamp() >= (startTime + timeoutValueToLift / 4)) {
 					placeGearAuto(gear);
 				} else {
-					moveGearUp(gear);
 				}
 
 			} else if (state == State.BACK_UP) {
@@ -414,7 +420,7 @@ public class Drive {
 				}
 			} else {
 
-}
+			}
 		default:
 		}
 		// case CENTER:
@@ -576,6 +582,10 @@ public class Drive {
 			pressed = false;
 		}
 
+		if(joystick1.getRawButton(9)){
+			ahrs.zeroYaw();
+		}
+		
 		chessyDrive(joystick1, 1, joystick1, 0);
 
 	}
@@ -606,11 +616,11 @@ public class Drive {
 
 			if (ahrs.getAngle() > 3 + currentAngle) {
 
-				rotateValue += .15;
+				rotateValue += .25;
 
 			} else if (ahrs.getAngle() < -3 + currentAngle) {
 
-				rotateValue -= .15;
+				rotateValue -= .25;
 
 			}
 
@@ -633,11 +643,11 @@ public class Drive {
 
 		if (rotateValue < 0.1 && rotateValue > -0.1) {
 
-			if (ahrs.getYaw() > 1.5 + currentAngle) {
+			if (ahrs.getYaw() > 1.2 + currentAngle) {
 
 				rotateValue += rotateIncrease;
 
-			} else if (ahrs.getYaw() < -1.5 + currentAngle) {
+			} else if (ahrs.getYaw() < -1.2 + currentAngle) {
 
 				rotateValue -= rotateDecrease;
 
@@ -694,8 +704,8 @@ public class Drive {
 
 	private void placeGearAuto(Gear gear) {
 
-		gear.gearClawSet(-0.4);
-		gear.gearArmSet(-0.3);
+		gear.gearClawSet(-0.3);
+		gear.gearArmSet(0.5);
 
 	}
 
@@ -732,11 +742,11 @@ public class Drive {
 
 		if (SmartDashboard.getNumber("CenterX") > 185) {
 
-			driveStyle.arcadeDrive(0, -0.25, false);
+			driveStyle.arcadeDrive(0, 0.28, false);
 
 		} else if (SmartDashboard.getNumber("CenterX") < 135) {
 
-			driveStyle.arcadeDrive(0, 0.25, false);
+			driveStyle.arcadeDrive(0, -0.28, false);
 
 		} else {
 
@@ -750,11 +760,11 @@ public class Drive {
 
 		if (SmartDashboard.getNumber("CenterX") > 170) {
 
-			driveStyle.arcadeDrive(0, -0.25, false);
+			driveStyle.arcadeDrive(0, 0.26, false);
 
 		} else if (SmartDashboard.getNumber("CenterX") < 150) {
 
-			driveStyle.arcadeDrive(0, 0.25, false);
+			driveStyle.arcadeDrive(0, -0.26, false);
 
 		} else {
 
@@ -786,8 +796,7 @@ public class Drive {
 			state = State.TURN;
 
 		} else {
-			right1.set(-.25);
-			left1.set(.23);
+			chessyDriveAuto(-0.33, 0);
 		}
 	}
 

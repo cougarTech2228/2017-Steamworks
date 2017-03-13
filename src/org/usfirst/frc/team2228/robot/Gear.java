@@ -180,9 +180,9 @@ public class Gear
 
 	public void gearArmSet(double vel)
 	{
-		if(vel > 0 && potentiometerArm.getValue()<2300){
+		if(vel < 0 && potentiometerArm.getValue()<2300){
 			gearArm.set(vel);
-		}else if(vel < 0){
+		}else if(vel > 0){
 			gearArm.set(vel);
 		}
 		// gearJaws.set(vel);
