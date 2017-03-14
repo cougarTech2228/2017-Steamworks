@@ -1,15 +1,11 @@
 package org.usfirst.frc.team2228.robot;
 
 import com.ctre.CANTalon;
-
-<<<<<<<HEAD
 import edu.wpi.first.wpilibj.DigitalInput;
 
-=======
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;import edu.wpi.first.wpilibj.Joystick;>>>>>>>branch'master'of https://github.com/cougarTech2228/2017-Steamworks
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Gear {
@@ -24,7 +20,7 @@ public class Gear {
 	private boolean moveGearArmDown = false;
 	private boolean gearGraspRelease = false;
 
-	private XboxIF;
+	private XboxIF xbox;
 	private boolean gearGuideCollect = false;
 	private double open;
 	private double guideUp = -0.2;
@@ -42,8 +38,6 @@ public class Gear {
 	private double gearJawOpenValue = -0.3;
 	private double gearJawCloseValue = 0.3;
 
-	
-
 	private double armUp = -0.7;
 	private double armDown = 0.4;
 
@@ -54,19 +48,21 @@ public class Gear {
 	private AnalogInput potentiometerJaw;
 	private DigitalInput fwdLimitSwitch;
 	private DigitalInput revLimitSwitch;
+
 	// Constructor
-		public Gear(XboxIF xbox){
-	gearLoadCollectionGuide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
+	public Gear(XboxIF xbox) {
+		gearLoadCollectionGuide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
 
-	gearArm = new CANTalon(RobotMap.GEAR_ARM);
-	gearJaw = new CANTalon(RobotMap.GEAR_JAW);
+		gearArm = new CANTalon(RobotMap.GEAR_ARM);
+		gearJaw = new CANTalon(RobotMap.GEAR_JAW);
 
-	potentiometerArm=new AnalogInput(1);
-	potentiometerJaw=new AnalogInput(2);
-	SmartDashboard.putNumber("ArmPotentiometer",potentiometerArm.getValue());
-	SmartDashboard.putNumber("JawPotentiometer",potentiometerJaw.getValue());
+		potentiometerArm = new AnalogInput(1);
+		potentiometerJaw = new AnalogInput(2);
+		SmartDashboard.putNumber("ArmPotentiometer", potentiometerArm.getValue());
+		SmartDashboard.putNumber("JawPotentiometer", potentiometerJaw.getValue());
 
-	fwdLimitSwitch=new DigitalInput(6);revLimitSwitch=new DigitalInput(7);
+		fwdLimitSwitch = new DigitalInput(6);
+		revLimitSwitch = new DigitalInput(7);
 
 	}
 
@@ -81,49 +77,22 @@ public class Gear {
 	}
 
 	// Called continuously during the teleop period
-	<<<<<<<HEAD
-
-	public void teleopPeriodic()
-	{
-		gearCollection = RobotMap.BUTTON_TWO;
-		gearGraspRelease = RobotMap.BUTTON_THREE;
-		if (gearCollection)
-		{
-			// leftGearCollector.set(-0.9);
-			gearJaw.set(gearJawOpenValue);
-		}
-		else if (gearGraspRelease)
-		{
-			// leftGearCollector.set(.9);
-
-			gearJaw.set(gearJawCloseValue);
-		}
-		else
-		{
-=======
 
 	public void teleopPeriodic() {
-		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
-		gearGraspRelease = joystick.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
+		boolean toggle = false;
+		gearCollection = xbox.getCloseGearButton(toggle);
+		gearGraspRelease = xbox.getOpenGearButton(toggle);
 		if (gearCollection) {
 			gearJaw.set(gearCollectionValue);
 		} else if (gearGraspRelease) {
 			gearJaw.set(gearReleaseValue);
 		} else {
->>>>>>> branch 'master' of https://github.com/cougarTech2228/2017-Steamworks
+
 			gearJaw.set(0);
 		}
 
-<<<<<<< HEAD
-//		gearArmUpXbox = xbox.getRawAxis(3);
-//		gearArmDownXbox = xbox.getRawAxis(2);
-		moveGearArmUp = RobotMap.BUTTON_FOUR;
-		moveGearArmDown = RobotMap.BUTTON_ONE;
-		if (moveGearArmUp)
-=======
-		moveGearArmUp = joystick.getRawButton(RobotMap.BUTTON_6_MOVE_ARM_UP);
-		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
->>>>>>> branch 'master' of https://github.com/cougarTech2228/2017-Steamworks
+		moveGearArmUp = xbox.getArmUpButton(toggle);
+		moveGearArmDown = xbox.getMoveArmDownButton(toggle);
 
 		if (moveGearArmUp) {
 			// gearArm.set(armUp);
@@ -138,13 +107,7 @@ public class Gear {
 			// gearCollector.set(0);
 		} //
 
-<<<<<<< HEAD
-		SmartDashboard.putNumber("gearJaw Current", gearJaw.getOutputCurrent());
-		if(up.get() == false){
-			
-		}
-=======
-		gearGuideCollect = joystick.getRawButton(RobotMap.BUTTON_1_GEAR_COLLECTION);
+		gearGuideCollect = xbox.getCollectGearLoadStationButton(toggle);
 
 		// if (firstGearGuideCollectionValue != lastGearGuideCollectionValue) {
 		// if(firstGearGuideCollectionValue){
@@ -157,12 +120,6 @@ public class Gear {
 		// }
 		// }
 
->>>>>>> branch 'master' of https://github.com/cougarTech2228/2017-Steamworks
-	}
-
-	public boolean loadingGear() {
-
-		return joystick.getRawButton(6);
 	}
 
 	public void gearClawSet(double vel) {
