@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Climb {
 	private CANTalon climberMotor;
-	private VictorSP climber;
 	private boolean newValue = false;
 	private boolean oldValue = false;
 	private boolean climberOn = false;
@@ -21,10 +20,12 @@ public class Climb {
 	private XboxIF xbox;
 
 	// Constructor
+
 	public Climb(XboxIF xbox, PowerDistributionPanel _pdp) {
 
+
 		climberMotor = new CANTalon(RobotMap.ROBOT_CLIMBER);
-		climber = new VictorSP(RobotMap.ROBOT_CLIMBER_TEST);
+
 		pdp = _pdp;
 
 	}
@@ -40,46 +41,17 @@ public class Climb {
 	}
 
 	// Called continuously during the teleop period
+
+
+
 	public void teleopPeriodic() {
-		// FOR COMPETITION
-		// newValue = joystick
-		// .getRawButton(RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF);
-		//
-		// if (newValue != oldValue)
-		// {
-		//
-		// if (newValue)
-		// {
-		//
-		// if (!climberOn)
-		// {
-		//
-		// climberMotor.set(fullPower);
-		// climberOn = true;
-		//
-		// }
-		// else
-		// {
-		//
-		// climberMotor.set(noPower);
-		// climberOn = false;
-		//
-		// }
-		//
-		// }
-		// oldValue = newValue;
-		// }
-		//
-		// }
-
-		// FOR TEST BOT
-
-		currentClimberCurrent = pdp.getCurrent(8);
+//		currentClimberCurrent = pdp.getCurrent(8);
 		SmartDashboard.putNumber("Current to the Climber", currentClimberCurrent);
-		newValue = RobotMap.BUTTON_EIGHT;
+		boolean toggle = true;
+		newValue = xbox.getClimbOnButton(toggle);
 
 		if (maxClimberCurrent <= currentClimberCurrent) {
-			climber.set(.75);
+			climberMotor.set(.75);
 			System.out.println("Current is too high, climber is recieving less power!");
 		} else if (newValue != oldValue) {
 
@@ -87,12 +59,14 @@ public class Climb {
 
 				if (!climberOn) {
 
-					climber.set(fullPower);
+					climberMotor.set(fullPower);
 					climberOn = true;
 
 				} else {
 
-					climber.set(noPower);
+
+					climberMotor.set(noPower);
+
 					climberOn = false;
 
 				}

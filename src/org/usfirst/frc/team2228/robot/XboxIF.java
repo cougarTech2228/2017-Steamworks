@@ -46,6 +46,8 @@ public class XboxIF {
 	private boolean collectGearLoadStationLastState;
 	private boolean collectGearLoadStationCurrentState;
 	private boolean collectGearLoadStationOff;
+	
+	int _channel;
 
 	public enum State {
 		TOGGLE, NOT_TOGGLED
@@ -53,7 +55,7 @@ public class XboxIF {
 
 	public XboxIF(int channel) {
 		xbox = new XboxController(channel);
-
+		_channel = channel; 
 		// public static boolean BUTTON_ONE = xbox.getAButton();
 		// boolean BUTTON_TWO = xbox.getBButton();
 		// boolean BUTTON_THREE = xbox.getXButton();
@@ -205,5 +207,16 @@ public class XboxIF {
 	public double getSpeedDecrease() {
 		return xbox.getTriggerAxis(rightHand);
 	}
-
+	public boolean getPOVUp(){
+		return (xbox.getPOV(_channel) == 0);
+	}
+	public boolean getPOVDown(){
+		return (xbox.getPOV(_channel) == 90);
+	}
+	public boolean getPOVLeft(){
+		return (xbox.getPOV(_channel) == 180);
+	}
+	public boolean getPOVRight(){
+		return (xbox.getPOV(_channel) == 270);
+	}
 }

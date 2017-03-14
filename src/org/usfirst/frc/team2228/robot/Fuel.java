@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel {
-	private XboxController xbox;
+
+	private XboxIF xbox;
+
 	private PowerDistributionPanel pdp;
 	private VictorSP fuelFurnaceRoller;
 	private VictorSP fuelLoadStationRoller;
@@ -26,7 +28,7 @@ public class Fuel {
 	private final double competitionConveyorSpeed = 1;
 	private final double competitionLoadStationSpeed = 1;
 	private final double competitionFurnaceDispenserSpeed = 1;
-	// private final double
+
 	private final double testBotConveyorSpeed = 1;
 	private final double testBotLoadStationSpeed = 1;
 	private final double testBotFurnaceDispenserSpeed = 1;
@@ -35,7 +37,9 @@ public class Fuel {
 	private double theFurnaceNowCurrent;
 
 	// Constructor
+
 	public Fuel(XboxIF xbox, PowerDistributionPanel pdpCurrent) {
+
 		pdp = pdpCurrent;
 		xbox = xbox;
 		// joystick2 = joy;
@@ -85,7 +89,9 @@ public class Fuel {
 		}
 		// >o<
 
-		firstLoadStationValue = (RobotMap.BUTTON_FIVE);
+		boolean toggle = true;
+		firstLoadStationValue = xbox.getCollectFuelButton(toggle);
+		
 
 		if (firstLoadStationValue != lastLoadStationValue) {
 			if (firstLoadStationValue == true) {
@@ -106,13 +112,16 @@ public class Fuel {
 		theLoadStationNowCurrent = pdp.getCurrent(0);
 		SmartDashboard.putNumber("Fuel Load Station Current", theLoadStationNowCurrent);
 
+
 		if (pdp.getCurrent(0) >= ConstantMap.MAX_LOAD_STATION_CURRENT) {
 			fuelLoadStationRoller.set(0);
 			SmartDashboard.putBoolean("Fuel Load Station Emergency Shut Down", true);
 		}
+
 		// >_<
 
-		firstFurnaceValue = RobotMap.BUTTON_SEVEN;
+
+		firstFurnaceValue = xbox.getReleaseFuelButton(toggle);
 
 		if (firstFurnaceValue != lastFurnaceValue) {
 			if (firstFurnaceValue == true) {
