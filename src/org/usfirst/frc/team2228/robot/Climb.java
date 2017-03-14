@@ -14,7 +14,7 @@ public class Climb {
 	private double maxClimberCurrent = 23;
 	private double currentClimberCurrent;
 	private PowerDistributionPanel pdp;
-	private int fullPower = 1;
+	private int fullPower = -1;
 	private int noPower = 0;
 	private Joystick joystick;
 

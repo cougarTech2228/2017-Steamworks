@@ -56,7 +56,6 @@ public class Robot extends IterativeRobot {
 
 	private double panAngle;
 	private double tiltAngle;
-	
 	/*
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -71,7 +70,6 @@ public class Robot extends IterativeRobot {
 		chooser.addObject("Left Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
 		chooser.addObject("Right Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
 		chooser.addDefault("Center Gear Vision", ConstantMap.AutoChoices.CENTER_GEAR_PLACEMENT);
-		chooser.addDefault("Gear Placement Dream", ConstantMap.AutoChoices.GEAR_PLACEMENT_DREAM);
 		chooser.addDefault("Center", ConstantMap.AutoChoices.CENTER);
 
 		SmartDashboard.putData("Auto choices", chooser);
@@ -94,7 +92,6 @@ public class Robot extends IterativeRobot {
 		grip = new GripPipeline();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("cam4", 1);
 		camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 
 		visionThread = new VisionThread(camera, grip, grip -> {
@@ -123,7 +120,6 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("CenterX", centerX);
 			}
 		});
-
 		visionThread.start();
 
 	}
@@ -149,7 +145,6 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		// System.out.println("You have reached autonomousPeriodic");
 		drive.autonomousPeriodic(gear);
-		
 
 	}
 
@@ -158,12 +153,11 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
 		fuel.teleopPeriodic();
-		gear.teleopPeriodic(fuel);
+		gear.teleopPeriodic();
 
 		// fuel.teleopPeriodic();
 
