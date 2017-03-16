@@ -53,7 +53,7 @@ public class Drive {
 	private double timeOutValueSecondMove;
 	// final int testBotRightEncoder = 4900;
 	// final int testBotLeftEncoder = -3200; what was on lambda
-	final int testBotRightEncoder = 4900*2;
+	final int testBotRightEncoder = 4900 * 2;
 	final int testBotLeftEncoder = -2400 * 2;
 
 	int testBotRightMoveToLiftEncoder = 3000;
@@ -192,7 +192,6 @@ public class Drive {
 		}
 	}
 
-	// Called continuously during the autonomous period
 	public void autonomousPeriodic(Gear gear) {
 		SmartDashboard.putNumber("ANGLE NAVX", ahrs.getAngle());
 		// SmartDashboard.putNumber("SONAR", sonar.getValue());
@@ -222,57 +221,58 @@ public class Drive {
 			break;
 
 		case CENTER:
-			if(ahrs.getYaw()== 0.0){
-			if (state == State.INIT) {
-				gear.gearArmSet(-0.5);
-				state = State.WAIT_FOR_TIME;
-				startTime = Timer.getFPGATimestamp();
-				timeStamps();
-
-			} else if (state == State.WAIT_FOR_TIME) {
-				if (Timer.getFPGATimestamp() >= (startTime + testBotTimeoutValue*4))
-
-				{
-					right1.set(0);
-					left1.set(0);
-					state = State.GEAR_PLACEMENT;
+			if (ahrs.getYaw() == 0.0) {
+				if (state == State.INIT) {
+					gear.gearArmSet(-0.5);
+					state = State.WAIT_FOR_TIME;
 					startTime = Timer.getFPGATimestamp();
-					System.out.println(Timer.getFPGATimestamp());
+					timeStamps();
 
-				} else if (right1.getPosition() >= testBotRightEncoder || left1.getPosition() <= testBotLeftEncoder) {
-					encoderStop();
-					startTime = Timer.getFPGATimestamp();
-					state = State.GEAR_PLACEMENT;
+				} else if (state == State.WAIT_FOR_TIME) {
+					if (Timer.getFPGATimestamp() >= (startTime + testBotTimeoutValue * 4))
 
-				} else {
-					right1.set(-0.25);
-					left1.set(0.22);
+					{
+						right1.set(0);
+						left1.set(0);
+						state = State.GEAR_PLACEMENT;
+						startTime = Timer.getFPGATimestamp();
+						System.out.println(Timer.getFPGATimestamp());
 
+					} else if (right1.getPosition() >= testBotRightEncoder
+							|| left1.getPosition() <= testBotLeftEncoder) {
+						encoderStop();
+						startTime = Timer.getFPGATimestamp();
+						state = State.GEAR_PLACEMENT;
+
+					} else {
+						right1.set(-0.25);
+						left1.set(0.22);
+
+					}
+				} else if (state == State.GEAR_PLACEMENT) {
+
+					gear.gearClawSet(-0.2);
+					gear.gearArmSet(.25);
+					if (Timer.getFPGATimestamp() >= (startTime + (testBotTimeoutValue / 2.0))) {
+
+						state = State.BACK_UP;
+						startTime = Timer.getFPGATimestamp();
+						System.out.println(Timer.getFPGATimestamp());
+						gear.gearArmSet(0);
+						gear.gearClawSet(0);
+
+					}
+
+				} else if (state == State.BACK_UP) {
+					if (Timer.getFPGATimestamp() >= (startTime + (testBotTimeoutValue / 3.0))) {
+
+						break;
+
+					} else {
+						right1.set(0.15);
+						left1.set(-0.13);
+					}
 				}
-			} else if (state == State.GEAR_PLACEMENT) {
-
-				gear.gearClawSet(-0.2);
-				gear.gearArmSet(.25);
-				if (Timer.getFPGATimestamp() >= (startTime + (testBotTimeoutValue / 2.0))) {
-
-					state = State.BACK_UP;
-					startTime = Timer.getFPGATimestamp();
-					System.out.println(Timer.getFPGATimestamp());
-					gear.gearArmSet(0);
-					gear.gearClawSet(0);
-
-				}
-
-			} else if (state == State.BACK_UP) {
-				if (Timer.getFPGATimestamp() >= (startTime + (testBotTimeoutValue / 3.0))) {
-
-					break;
-
-				} else {
-					right1.set(0.15);
-					left1.set(-0.13);
-				}
-			}
 			}
 			break;
 		default:
@@ -402,8 +402,6 @@ public class Drive {
 		// }
 	}
 
-	// Called continuously during the teleop period
-
 	public void teleopPeriodic() {
 		SmartDashboard.putNumber("ANGLE NAVX", ahrs.getAngle());
 
@@ -483,7 +481,7 @@ public class Drive {
 			counter = 0;
 
 		}
-//		 moveValue = smoothMove(moveValue);
+		// moveValue = smoothMove(moveValue);
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 	}
 

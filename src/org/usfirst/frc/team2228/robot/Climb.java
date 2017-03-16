@@ -41,7 +41,7 @@ public class Climb {
 	// Called continuously during the teleop period
 
 	public void teleopPeriodic() {
-//		currentClimberCurrent = pdp.getCurrent(8);
+		// currentClimberCurrent = pdp.getCurrent(8);
 		SmartDashboard.putNumber("Current to the Climber", currentClimberCurrent);
 		newValue = joystick.getRawButton(RobotMap.BUTTON_8_CLIMB_ON_AND_OFF);
 

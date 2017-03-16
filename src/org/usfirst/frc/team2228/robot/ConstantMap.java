@@ -13,7 +13,7 @@ public final class ConstantMap {
 	public static int FUEL_LOAD_STATION_IN_DIR = 1;
 	public static int FUEL_FURNACE_OUT_DIR = -1;
 
-	public static int timePeriodSF = 5;
+	public static int timePeriodSF = 10;
 
 	public enum AutoChoices {
 		DO_NOTHING, BASE_LINE_TIME_SENSOR, CENTER_GEAR_PLACEMENT, RIGHT_GEAR_PLACEMENT, LEFT_GEAR_PLACEMENT, VISION_GEAR_LEFT, VISION_GEAR_RIGHT, CENTER
