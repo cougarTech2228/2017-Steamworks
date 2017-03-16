@@ -40,7 +40,7 @@ public final class RobotMap {
 
 // Drive
 	// CANTalon ID's
-		public static int RIGHT_ONE_DRIVE = 1;
+		public static int RIGHT_ONE_DRIVE = 1;														
 		public static int RIGHT_TWO_DRIVE = 2;
 		public static int LEFT_ONE_DRIVE = 3;
 		public static int LEFT_TWO_DRIVE = 4;

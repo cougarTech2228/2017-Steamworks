@@ -45,10 +45,10 @@ public class Climb {
 		SmartDashboard.putNumber("Current to the Climber", currentClimberCurrent);
 		newValue = joystick.getRawButton(RobotMap.BUTTON_8_CLIMB_ON_AND_OFF);
 
-		if (maxClimberCurrent <= currentClimberCurrent) {
-			climberMotor.set(.75);
-			System.out.println("Current is too high, climber is recieving less power!");
-		} else if (newValue != oldValue) {
+//		if (maxClimberCurrent <= currentClimberCurrent) {
+//			climberMotor.set(.75);
+//			System.out.println("Current is too high, climber is recieving less power!");
+		/*}*/ if (newValue != oldValue) {
 
 			if (newValue) {
 
@@ -67,7 +67,7 @@ public class Climb {
 			oldValue = newValue;
 		}
 
-	}
+}
 
 	// Called continuously during testing
 	public void testPeriodic() {

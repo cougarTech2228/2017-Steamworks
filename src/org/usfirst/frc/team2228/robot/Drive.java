@@ -458,6 +458,12 @@ public class Drive {
 					}
 
 				}
+				if (Timer.getFPGATimestamp() >= (startTime + timeoutValue * 2)) {
+					startTime = Timer.getFPGATimestamp();
+
+					state = State.MOVE_TO_LIFT;
+					left1.setPosition(0);
+				}
 //			}	else if (state == State.VISION_ALIGNMENT) {
 //
 //				if (visionAlignment()) {
@@ -543,7 +549,7 @@ public class Drive {
 
 				if (/*
 					 * Timer.getFPGATimestamp() >= (startTime + timeoutValue)||
-					 */left1.getPosition() > 3100) {
+					 */left1.getPosition() > 2900) {
 					right1.set(0);
 					left1.set(0);
 					state = State.TURN;
@@ -564,6 +570,11 @@ public class Drive {
 						left1.setPosition(0);
 					}
 
+				}else if (Timer.getFPGATimestamp() >= (startTime + timeoutValue * 2)) {
+					startTime = Timer.getFPGATimestamp();
+
+					state = State.MOVE_TO_LIFT;
+					left1.setPosition(0);
 				}
 //			}	else if (state == State.VISION_ALIGNMENT) {
 //
@@ -791,7 +802,7 @@ public class Drive {
 			gearValue -= speedDecrease;
 			pressed = true;
 
-		} else if (!(joystick1.getRawAxis(3) > .8) || joystick1.getRawAxis(2) > .8)
+		} else if (!(joystick1.getRawAxis(3) > .8 || joystick1.getRawAxis(2) > .8))
 
 		{
 			pressed = false;
@@ -877,10 +888,10 @@ public class Drive {
 	private boolean turnAuto(int optimalAngle) {
 		double rotateValue = 0;
 
-		if (ahrs.getAngle() > optimalAngle + 2) {
+		if (ahrs.getAngle() > optimalAngle + 3) {
 
 			rotateValue += rotateIncrease;
-		} else if (ahrs.getAngle() < optimalAngle - 2) {
+		} else if (ahrs.getAngle() < optimalAngle - 3) {
 
 			rotateValue -= rotateDecrease;
 
