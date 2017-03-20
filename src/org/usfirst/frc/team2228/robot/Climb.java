@@ -53,7 +53,7 @@ public class Climb {
 			if (newValue) {
 
 				if (!climberOn) {
-
+					
 					climberMotor.set(fullPower);
 					climberOn = true;
 

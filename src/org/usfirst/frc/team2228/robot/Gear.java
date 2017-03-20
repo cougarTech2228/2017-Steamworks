@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Gear {
+public class Gear
+{
 	private CANTalon gearArm;
 	private CANTalon gearJaw;
-	private Spark gearLoadCollectionGuide;
+	private boolean loadingActivated;
+	private Spark guide;
 	private boolean firstGearGuideCollectionValue = false;
 	private boolean lastGearGuideCollectionValue = false;
 	private boolean guideOpen;
@@ -20,9 +22,9 @@ public class Gear {
 	private boolean moveGearArmDown = false;
 	private boolean gearGraspRelease = false;
 	private boolean gearGuideCollect = false;
-	private double open;
-	private double guideUp = -0.2;
-	private double guideDown = 0.4;
+	private double open ;
+	private double guideUp = 0.4;
+	private double guideDown = -0.4;
 	private Joystick joystick;
 	private double gearArmDownXbox;
 	private double gearArmUpXbox;
@@ -45,36 +47,44 @@ public class Gear {
 	private AnalogInput potentiometerJaw;
 	private DigitalInput fwdLimitSwitch;
 	private DigitalInput revLimitSwitch;
+	private int potentiometerMax = 0;
+//	private DigitalInput gearDetector;
 
 	// Constructor
-	public Gear(Joystick joy) {
-		gearLoadCollectionGuide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
+	public Gear(Joystick joy)
+	{
+		guide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
 		gearJaw = new CANTalon(RobotMap.GEAR_JAW);
 
-		potentiometerArm = new AnalogInput(1);
-		potentiometerJaw = new AnalogInput(2);
-		SmartDashboard.putNumber("ArmPotentiometer", potentiometerArm.getValue());
-		SmartDashboard.putNumber("JawPotentiometer", potentiometerJaw.getValue());
+		potentiometerArm = new AnalogInput(0);
+		potentiometerJaw = new AnalogInput(1);
+		SmartDashboard.putNumber("ArmPotentiometer",
+				potentiometerArm.getValue());
+		SmartDashboard.putNumber("JawPotentiometer",
+				potentiometerJaw.getValue());
 
 		fwdLimitSwitch = new DigitalInput(6);
 		revLimitSwitch = new DigitalInput(7);
-
+//		gearDetector = new DigitalInput(5);
+		loadingActivated = false;
 	}
 
 	// Called once at the beginning of the autonomous period
-	public void autonomousInit() {
+	public void autonomousInit()
+	{
 
 	}
 
 	// Called continuously during the autonomous period
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic()
+	{
 
 	}
 
 	// Called continuously during the teleop period
-	public void teleopPeriodic() {
+	public void teleopPeriodic(Fuel fuel) {
 		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
 		gearGraspRelease = joystick.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
 		if (gearCollection) {
@@ -89,8 +99,11 @@ public class Gear {
 		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
 
 		if (moveGearArmUp) {
-			// gearArm.set(armUp);
-			gearArm.set(armUp);
+			if(gearArm.isRevLimitSwitchClosed()){
+//				gearArm.set(0);
+			}else{
+				gearArm.set(armUp);
+			}
 			// gearJaw.set(gearCollectionValue);
 		} else if (moveGearArmDown) {
 			gearArm.set(armDown);
@@ -100,9 +113,39 @@ public class Gear {
 			// leftGearCollector.set(0);
 			// gearCollector.set(0);
 		} //
-
+		
 		gearGuideCollect = joystick.getRawButton(RobotMap.BUTTON_1_GEAR_COLLECTION);
 
+		
+		if(gearGuideCollect){
+			if(revLimitSwitch.get()){
+				guide.set(guideDown);
+			}else{
+				guide.set(0);
+			}
+		
+			fuel.fuelLoadStationRollerSet(rollerVelocity);
+			if(/*gearArm.isFwdLimitSwitchClosed()*/ potentiometerArm.getValue() >= 500){
+				gearJaw.set(gearJawOpenValue);
+				gearArmSet(0);
+			}else{
+				gearArm.set(armUp);
+				gearJaw.set(gearJawCloseValue*2);
+			}
+		
+		}else{
+			
+			if(fwdLimitSwitch.get()){
+				guide.set(guideUp);
+				fuel.fuelLoadStationRollerSet(0);
+
+			}else{
+				guide.set(0);
+			}
+			loadingActivated = false;
+			
+		}
+		
 		// if (firstGearGuideCollectionValue != lastGearGuideCollectionValue) {
 		// if(firstGearGuideCollectionValue){
 		// if(!guideOpen){
@@ -113,36 +156,57 @@ public class Gear {
 		// `}
 		// }
 		// }
+		
+		
+		SmartDashboard.putNumber("Pot1", potentiometerArm.getValue());
+	//	SmartDashboard.putNumber("Pot2", potentiometerJaw.getValue());
+//		SmartDashboard.putBoolean("da gear is dere", gearDetector.get());
+
 
 	}
 
-	public boolean loadingGear() {
+	public boolean loadingGear()
+	{
 
 		return joystick.getRawButton(6);
 	}
 
-	public void gearClawSet(double vel) {
+	public void gearClawSet(double vel)
+	{
 		gearJaw.set(vel);
 	}
 
-	public void gearArmSet(double vel) {
-		gearArm.set(vel);
+	public void gearArmSet(double vel)
+	{
+		if(vel > 0 && potentiometerArm.getValue()>potentiometerMax){
+			gearArm.set(vel);
+		}else if(vel < 0){
+			gearArm.set(vel);
+		}
 		// gearJaws.set(vel);
 	}
 
-	public void raiseTheArm() {
-		if (gearArm.isFwdLimitSwitchClosed()) {
+	public void raiseTheArm()
+	{
+		if (gearArm.isFwdLimitSwitchClosed() && potentiometerArm.getValue()>potentiometerMax)
+		{
 			gearArmSet(armUp);
 
-		} else if (!gearArm.isRevLimitSwitchClosed() && !gearArm.isFwdLimitSwitchClosed()) {
+		}
+		else if (!gearArm.isRevLimitSwitchClosed()
+				&& !gearArm.isFwdLimitSwitchClosed())
+		{
 			gearArm.set(armUp);
-		} else {
+		}
+		else
+		{
 
 		}
 	}
 
 	// Called continuously during testing
-	public void testPeriodic() {
+	public void testPeriodic()
+	{
 
 	}
 }
