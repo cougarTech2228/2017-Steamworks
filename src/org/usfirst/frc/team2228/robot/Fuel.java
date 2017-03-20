@@ -16,6 +16,8 @@ public class Fuel {
 	private VictorSP fuelFurnaceRoller;
 	private VictorSP fuelLoadStationRoller;
 	private VictorSP fuelConveyorRoller;
+	private Spark fuelGuide;
+	private double rollerVelocity = -0.5;
 	private boolean firstConveyorValue = false;
 	private boolean lastConveyorValue = false;
 	private boolean firstLoadStationValue = false;
@@ -36,21 +38,39 @@ public class Fuel {
 	private double theFurnaceNowCurrent;
 	private DigitalInput fwdLimitSwitch;
 	private DigitalInput revLimitSwitch;
-
+	private final double conveyorSpeed = -1;
+	private final double loadStationSpeed = 1;
+	private final double furnaceDispenserSpeed = 1;
+	private double guideUpSpeed = 0.3;
+	private double guideDownSpeed = -0.3;
+	private double fuelDischargeSpeed = -1;
+	private boolean newValue;
+	private boolean oldValue;
+	private boolean conveyorOn;
+	private boolean fuelGuideCollect;
+	private double guideUp = -0.4;
+	private double guideDown = 0.4;
 	// Constructor
 	public Fuel(Joystick joy, PowerDistributionPanel pdpCurrent) {
+		
+		fuelGuideCollect = false;
+		newValue = true;
+		oldValue = false;
+		conveyorOn = false;
 		pdp = pdpCurrent;
 		joystick = joy;
 		// joystick2 = joy;
 		fuelFurnaceRoller = new VictorSP(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
 		fuelLoadStationRoller = new VictorSP(RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
 		fuelConveyorRoller = new VictorSP(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
+		
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
 		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
 		SmartDashboard.putBoolean("Furnace Roller Power", false);
-		guide = new Spark(RobotMap.FUEL_LOAD_STATION_GUIDE_MOTOR);
-		fwdLimitSwitch = new DigitalInput(6);
-		revLimitSwitch = new DigitalInput(7);
+//		guide = new Spark(RobotMap.FUEL_LOAD_STATION_GUIDE_MOTOR);
+		fuelGuide = new Spark(8);
+		fwdLimitSwitch = new DigitalInput(8);
+		revLimitSwitch = new DigitalInput(9);
 	}
 
 	// Called once at the beginning of the autonomous period
@@ -147,6 +167,92 @@ public class Fuel {
 
 	}
 
+public void fuelFurnaceRollerSet(double vel){
+		
+		fuelFurnaceRoller.set(vel);
+		
+	}
+	
+
+	public void collectFuel(){
+		
+		fuelLoadStationRoller.set(1);
+		if(fwdLimitSwitch.get()){
+			fuelGuide.set(guideDownSpeed);
+		}
+		
+	}
+	
+	public void guidesUp(){
+		
+		if(revLimitSwitch.get()){
+			fuelGuide.set(guideUpSpeed);
+		}
+		
+	}
+	
+	public void dischargeFuel(){
+		
+		fuelFurnaceRoller.set(fuelDischargeSpeed);
+		
+	}
+	
+	public void collectFuelFloor(){
+		
+		
+		newValue = joystick.getRawButton(/*RobotMap.JOY1_BUTTON_11_CLIMB_ON_AND_OFF*/10);
+
+		if (newValue != oldValue) {
+			
+			if (newValue) {
+				
+				if (!conveyorOn) {
+					
+					fuelConveyorRoller.set(conveyorSpeed);
+					conveyorOn = true;
+					
+				}else {
+					
+					fuelConveyorRoller.set(0);
+					conveyorOn = false;
+					
+				}
+
+			}
+			oldValue = newValue;
+		}
+		
+	}
+	
+	
+	public void fuelCollectLoadingStation(){
+		fuelGuideCollect = joystick.getRawButton(4);
+
+		
+		if(fuelGuideCollect){
+			if(fwdLimitSwitch.get()){
+				fuelGuide.set(guideDown);
+			}else{
+				fuelGuide.set(0);
+			}
+			
+			fuelLoadStationRollerSet(-rollerVelocity);
+			
+		
+		}else{
+			
+			if(revLimitSwitch.get()){
+				fuelGuide.set(guideUp);
+				fuelLoadStationRollerSet(0);
+
+			}else{
+				fuelGuide.set(0);
+			}
+			
+		}
+	}
+	
+	
 	// Called continuously during testing
 	public void testPeriodic() {
 
@@ -167,5 +273,8 @@ public class Fuel {
 		
 		fuelLoadStationRoller.set(rollerVelocity);
 		
+	}
+	public void fuelDischargeStop(){
+		fuelFurnaceRoller.set(0);
 	}
 }

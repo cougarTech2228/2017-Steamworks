@@ -13,9 +13,9 @@ public final class RobotMap {
 		public static int GEAR_LOAD_STATION_GUIDE = 9;
 
 		// Button 3 releases the gear
-		public static int BUTTON_3_RELEASE_THE_GEAR = 2;
+		public static int BUTTON_3_RELEASE_THE_GEAR = 3;
 		// Button 2 collects the gear
-		public static int BUTTON_2_COLLECT_THE_GEAR = 3;
+		public static int BUTTON_2_COLLECT_THE_GEAR = 2;
 		// Button 4 moves the arm down
 		public static int BUTTON_5_MOVE_ARM_DOWN = 5;
 		// Button 1 moves the arm up

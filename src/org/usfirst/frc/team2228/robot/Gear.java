@@ -23,8 +23,8 @@ public class Gear
 	private boolean gearGraspRelease = false;
 	private boolean gearGuideCollect = false;
 	private double open ;
-	private double guideUp = -0.4;
-	private double guideDown = 0.4;
+	private double guideUp = 0.4;
+	private double guideDown = -0.4;
 	private Joystick joystick;
 	private double gearArmDownXbox;
 	private double gearArmUpXbox;
@@ -47,7 +47,8 @@ public class Gear
 	private AnalogInput potentiometerJaw;
 	private DigitalInput fwdLimitSwitch;
 	private DigitalInput revLimitSwitch;
-	private DigitalInput gearDetector;
+	private int potentiometerMax = 0;
+//	private DigitalInput gearDetector;
 
 	// Constructor
 	public Gear(Joystick joy)
@@ -57,16 +58,16 @@ public class Gear
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
 		gearJaw = new CANTalon(RobotMap.GEAR_JAW);
 
-		potentiometerArm = new AnalogInput(1);
-		potentiometerJaw = new AnalogInput(2);
+		potentiometerArm = new AnalogInput(0);
+		potentiometerJaw = new AnalogInput(1);
 		SmartDashboard.putNumber("ArmPotentiometer",
 				potentiometerArm.getValue());
 		SmartDashboard.putNumber("JawPotentiometer",
 				potentiometerJaw.getValue());
 
-		fwdLimitSwitch = new DigitalInput(9);
-		revLimitSwitch = new DigitalInput(8);
-		gearDetector = new DigitalInput(5);
+		fwdLimitSwitch = new DigitalInput(6);
+		revLimitSwitch = new DigitalInput(7);
+//		gearDetector = new DigitalInput(5);
 		loadingActivated = false;
 	}
 
@@ -98,8 +99,8 @@ public class Gear
 		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
 
 		if (moveGearArmUp) {
-			if(potentiometerArm.getValue() > 2300){
-				gearArm.set(0);
+			if(gearArm.isRevLimitSwitchClosed()){
+//				gearArm.set(0);
 			}else{
 				gearArm.set(armUp);
 			}
@@ -117,20 +118,15 @@ public class Gear
 
 		
 		if(gearGuideCollect){
-			if(fwdLimitSwitch.get()){
+			if(revLimitSwitch.get()){
 				guide.set(guideDown);
 			}else{
 				guide.set(0);
 			}
-			
+		
 			fuel.fuelLoadStationRollerSet(rollerVelocity);
-			if(potentiometerArm.getValue() > 2300){
-				if(gearDetector.get() && !loadingActivated){
-					gearJaw.set(gearJawOpenValue);
-					loadingActivated = true;
-				}else{
-					gearJaw.set(gearJawCloseValue*2);
-				}
+			if(/*gearArm.isFwdLimitSwitchClosed()*/ potentiometerArm.getValue() >= 500){
+				gearJaw.set(gearJawOpenValue);
 				gearArmSet(0);
 			}else{
 				gearArm.set(armUp);
@@ -139,8 +135,10 @@ public class Gear
 		
 		}else{
 			
-			if(revLimitSwitch.get()){
+			if(fwdLimitSwitch.get()){
 				guide.set(guideUp);
+				fuel.fuelLoadStationRollerSet(0);
+
 			}else{
 				guide.set(0);
 			}
@@ -162,7 +160,7 @@ public class Gear
 		
 		SmartDashboard.putNumber("Pot1", potentiometerArm.getValue());
 	//	SmartDashboard.putNumber("Pot2", potentiometerJaw.getValue());
-		SmartDashboard.putBoolean("da gear is dere", gearDetector.get());
+//		SmartDashboard.putBoolean("da gear is dere", gearDetector.get());
 
 
 	}
@@ -180,9 +178,9 @@ public class Gear
 
 	public void gearArmSet(double vel)
 	{
-		if(vel < 0 && potentiometerArm.getValue()<2300){
+		if(vel > 0 && potentiometerArm.getValue()>potentiometerMax){
 			gearArm.set(vel);
-		}else if(vel > 0){
+		}else if(vel < 0){
 			gearArm.set(vel);
 		}
 		// gearJaws.set(vel);
@@ -190,7 +188,7 @@ public class Gear
 
 	public void raiseTheArm()
 	{
-		if (gearArm.isFwdLimitSwitchClosed())
+		if (gearArm.isFwdLimitSwitchClosed() && potentiometerArm.getValue()>potentiometerMax)
 		{
 			gearArmSet(armUp);
 
