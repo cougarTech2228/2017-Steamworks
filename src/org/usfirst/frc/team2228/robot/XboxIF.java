@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 
 public class XboxIF {
-	public static XboxController xbox;
-	public static Hand leftHand;
-	public static Hand rightHand;
+	private XboxController xbox;
+	public  Hand leftHand;
+	public  Hand rightHand;
 
 	private boolean armUp = false;
 	private boolean armDown = false;
@@ -53,7 +53,7 @@ public class XboxIF {
 		TOGGLE, NOT_TOGGLED
 	}
 
-	public XboxIF(int channel) {
+	public XboxIF(final int channel) {
 		xbox = new XboxController(channel);
 		_channel = channel; 
 		// public static boolean BUTTON_ONE = xbox.getAButton();
@@ -218,5 +218,8 @@ public class XboxIF {
 	}
 	public boolean getPOVRight(){
 		return (xbox.getPOV(_channel) == 270);
+	}
+	public int getPOVBoi(){
+		return xbox.getPOV(_channel);
 	}
 }

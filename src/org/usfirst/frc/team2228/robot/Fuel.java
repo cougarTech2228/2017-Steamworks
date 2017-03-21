@@ -13,8 +13,8 @@ public class Fuel {
 	private XboxIF xbox;
 
 	private PowerDistributionPanel pdp;
-	private VictorSP fuelFurnaceRoller;
-	private VictorSP fuelLoadStationRoller;
+	private Spark fuelFurnaceRoller;
+	private Spark fuelLoadStationRoller;
 	private VictorSP fuelConveyorRoller;
 	private boolean firstConveyorValue = false;
 	private boolean lastConveyorValue = false;
@@ -38,14 +38,14 @@ public class Fuel {
 
 	// Constructor
 
-	public Fuel(XboxIF xbox, PowerDistributionPanel pdpCurrent) {
+	public Fuel(XboxIF _xbox, PowerDistributionPanel pdpCurrent) {
 
 		pdp = pdpCurrent;
-		xbox = xbox;
+		xbox = _xbox;
 		// joystick2 = joy;
-		fuelFurnaceRoller = new VictorSP(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
-		fuelLoadStationRoller = new VictorSP(RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
-		fuelConveyorRoller = new VictorSP(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
+		//fuelFurnaceRoller = new Spark(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
+//		fuelLoadStationRoller = new Spark(RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
+//		fuelConveyorRoller = new Spark(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
 		SmartDashboard.putBoolean("Fuel Roller Power", false);
 		SmartDashboard.putBoolean("Fuel Load Station Roller Power", false);
 		SmartDashboard.putBoolean("Furnace Roller Power", false);

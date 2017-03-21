@@ -37,7 +37,7 @@ public class Robot extends IterativeRobot {
 	// Carrying the classes from this project's library
 	private XboxIF xbox;
 	private Gear gear;
-	private Fuel fuel;
+	//private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
 
@@ -80,10 +80,11 @@ public class Robot extends IterativeRobot {
 		xbox = new XboxIF(1);
 		pdp = new PowerDistributionPanel();
 
-		fuel = new Fuel(xbox, pdp);
-		drive = new Drive(xbox);
-		climb = new Climb(xbox, pdp);
-		gear = new Gear(xbox);
+		//fuel = new Fuel(xbox, pdp);
+		//gear = new Gear(xbox);
+		drive = new Drive();
+		//climb = new Climb(xbox, pdp);
+		
 
 		// shooter = new CANTalon(RobotMap.RIGHT_SHOOTER_ONE);
 		// SmartDashboard.putString("autonomous selection",
@@ -159,9 +160,9 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
-		climb.teleopPeriodic();
-		fuel.teleopPeriodic();
-		gear.teleopPeriodic();
+		//climb.teleopPeriodic();
+	//	fuel.teleopPeriodic();
+		//gear.teleopPeriodic();
 
 		// fuel.teleopPeriodic();
 
@@ -191,7 +192,7 @@ public class Robot extends IterativeRobot {
 		pan.setAngle(panAngle);
 		tilt.setAngle(tiltAngle);
 
-		SmartDashboard.putNumber("POV VALUE", xbox.xbox.getPOV());
+		SmartDashboard.putNumber("POV VALUE", xbox.getPOVBoi());
 
 		// pan.setAngle(90);
 		// tilt.setAngle(90);

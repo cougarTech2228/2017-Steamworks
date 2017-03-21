@@ -50,7 +50,7 @@ public class Gear {
 	private DigitalInput revLimitSwitch;
 
 	// Constructor
-	public Gear(XboxIF xbox) {
+	public Gear(XboxIF _xbox) {
 		gearLoadCollectionGuide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
 
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
@@ -63,7 +63,7 @@ public class Gear {
 
 		fwdLimitSwitch = new DigitalInput(6);
 		revLimitSwitch = new DigitalInput(7);
-
+		xbox = _xbox;
 	}
 
 	// Called once at the beginning of the autonomous period

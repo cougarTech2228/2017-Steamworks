@@ -89,7 +89,7 @@ public class Drive {
 
 	// Constructor
 
-	public Drive(XboxIF xbox) {
+	public Drive() {
 		// "Creating" the objects
 		// Create the four motor controller objects for the drive base
 		right1 = new CANTalon(RobotMap.RIGHT_ONE_DRIVE); // 2

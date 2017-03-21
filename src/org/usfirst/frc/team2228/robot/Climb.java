@@ -21,9 +21,9 @@ public class Climb {
 
 	// Constructor
 
-	public Climb(XboxIF xbox, PowerDistributionPanel _pdp) {
-
-
+	public Climb(XboxIF _xbox, PowerDistributionPanel _pdp) {
+		xbox = _xbox;
+		
 		climberMotor = new CANTalon(RobotMap.ROBOT_CLIMBER);
 
 		pdp = _pdp;
