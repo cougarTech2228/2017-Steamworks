@@ -15,8 +15,22 @@ public final class ConstantMap {
 
 	public static int timePeriodSF = 30;
 
+	// CTRE CIMCoder magnetic quadrature (4) encoder 20 pulse per turn
+	//  AndyMark tough box mini 14:50 to 16:48 
+	// 857 = (50/14)*(48/16)*20*4
+	public static final long COUNTS_PER_REV = 857;
+	// gear box changes to 14:50 19:45 
+	public static final long FASTER_COUNTS_PER_REV = 676;
+	public static final long WHEEL_DIAMETER = 6; // inches
+	
+	public static final double COUNTS_INCH = COUNTS_PER_REV / (WHEEL_DIAMETER * Math.PI);
+	public static final double FAST_COUNTS_INCH = FASTER_COUNTS_PER_REV / (WHEEL_DIAMETER * Math.PI);
+	
+
 	public enum AutoChoices {
-		DO_NOTHING, BASE_LINE_TIME_SENSOR, CENTER_GEAR_PLACEMENT, RIGHT_GEAR_PLACEMENT, LEFT_GEAR_PLACEMENT, VISION_GEAR_LEFT, VISION_GEAR_RIGHT, CENTER, GEAR_PLACEMENT_DREAM, GEAR_AND_FUEL_PLACEMENT_LEFT
+		DO_NOTHING, BASE_LINE_TIME_SENSOR, CENTER_GEAR_PLACEMENT, 
+		RIGHT_GEAR_PLACEMENT, LEFT_GEAR_PLACEMENT, VISION_GEAR_LEFT, 
+		VISION_GEAR_RIGHT, CENTER, GEAR_PLACEMENT_DREAM, GEAR_AND_FUEL_PLACEMENT_LEFT
 	}
 
 }

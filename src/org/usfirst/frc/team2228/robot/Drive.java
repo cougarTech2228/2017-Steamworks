@@ -315,7 +315,8 @@ public class Drive
 //				}
 				else if (state == State.MOVE_TO_LIFT)
 				{
-					if (Timer.getFPGATimestamp() >= (startTime + 6.0) || left1.getPosition() <= -3600)
+					if (Timer.getFPGATimestamp() >= (startTime + 6.0) || 
+							left1.getPosition() <= -3600)
 					{
 						right1.set(0);
 						left1.set(0);
