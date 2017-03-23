@@ -15,7 +15,7 @@ public final class ConstantMap {
 
 	public static int timePeriodSF = 30;
 
-	// CTRE CIMCoder magnetic quadrature (4) encoder 20 pulse per turn
+	// CTRE CIMCoder magnetic quadrature (4) encoder 20 pu lse per turn
 	//  AndyMark tough box mini 14:50 to 16:48 
 	// 857 = (50/14)*(48/16)*20*4
 	public static final long COUNTS_PER_REV = 857;
