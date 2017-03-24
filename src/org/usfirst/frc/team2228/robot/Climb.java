@@ -5,7 +5,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.VictorSP;
-
+// Hi
 public class Climb {
 	private CANTalon climberMotor;
 	private boolean newValue = false;
