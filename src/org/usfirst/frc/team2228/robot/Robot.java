@@ -13,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -41,7 +42,6 @@ public class Robot extends IterativeRobot
 	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-
 	private PowerDistributionPanel pdp;
 
 	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();

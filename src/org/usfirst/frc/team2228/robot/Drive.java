@@ -5,7 +5,6 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Joystick;
@@ -13,17 +12,15 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.VictorSP;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.ArrayList;
-import java.util.List;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 
 public class Drive
 {
-	private double xSpeedDeadBan = .1;
+	private double xSpeedDeadBand = .1;
+	public static final int kLowSmooth = 5;
+	public static final int kHighSmooth = 35;
+	public int timePeriodSF = 35;
 	private int xZero = 0;
 	private RobotDrive driveStyle;
 	private Joystick joystick1;
@@ -33,10 +30,8 @@ public class Drive
 	private CANTalon left2;
 	private Fuel fuelClass;
 	private Gear gear;
-	private VictorSP fuelFurnaceDispenser;
 	private boolean newButtonValue = false;
 	private boolean oldButtonValue = false;
-	private boolean driveType = false;
 	private double startTime;
 	private double gearValue;
 	private boolean pressed;
@@ -46,8 +41,6 @@ public class Drive
 	private double rotateValue;
 	private double encoder;
 	private int largeAngle = 60;
-	private double timeoutValueSecondMove = 1.5;
-	private double competitionGearPlacementDrivingSpeed = 0.35;
 	private double testBotleftBlueTimeoutValueSecondMove = 1.5;
 	private double speedIncreaseXbox;
 	private double speedDecreaseXbox;
@@ -104,7 +97,6 @@ public class Drive
 		joystick1 = joystick;
 		// Create the RobotDrive object
 		driveStyle = new RobotDrive(right1, left1);
-
 		right1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		right1.enableBrakeMode(false);
 		left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
@@ -126,7 +118,7 @@ public class Drive
 
 		try
 		{
-			ahrs = new AHRS(SerialPort.Port.kUSB);
+			ahrs = new AHRS(SPI.Port.kOnboardCS0);
 		}
 		catch (RuntimeException ex)
 		{
@@ -295,14 +287,16 @@ public class Drive
 					state = State.DISPENSE_DA_FUEL;
 					startTime = Timer.getFPGATimestamp();
 					startTime += 3.0;
-					gear.gearClawSet(-.4);
+					gear.gearClawSet(.4);
 				}
 				else if (state == State.DISPENSE_DA_FUEL)
 				{
 					if (Timer.getFPGATimestamp() >= startTime)
 					{
+						System.out.println("Move to Lift");
 						fuelClass.fuelDischargeStop();
 						state = State.MOVE_TO_LIFT;
+						startTime = Timer.getFPGATimestamp();
 					}
 					else
 					{
@@ -326,60 +320,71 @@ public class Drive
 				// }
 				else if (state == State.MOVE_TO_LIFT)
 				{
-					if (Timer.getFPGATimestamp() >= (startTime + 6.0)
-							|| left1.getPosition() <= -3600)
+					if (Timer.getFPGATimestamp() >= (startTime + 6.0) )
 					{
+						System.out.println("Vision Alignment");
 						right1.set(0);
 						left1.set(0);
-						state = State.VISION_ALIGNMENT;
+						state = State.PLACE_GEAR;
+						startTime = Timer.getFPGATimestamp();
+					}
+					else if (left1.getPosition() <= -(128 * ConstantMap.FAST_COUNTS_INCH)) {
+						System.out.println("Encoder Stop");
+						right1.set(0);
+						left1.set(0);
+						state = State.PLACE_GEAR;
 					}
 					else
 					{
-						chessyDriveAuto(-.33, 0);
+						chessyDriveAuto(-0.33, 0);
 					}
 					
 				}
-				else if(state == State.VISION_ALIGNMENT ){
-					if (visionAlignment())
-						{
-							visionAngle = ahrs.getAngle();
-							state = State.VISION_SECOND;
-							startTime = Timer.getFPGATimestamp();
-						}
-	
-					}
-				else if (state == State.VISION_SECOND) {
-	
-						if (Timer.getFPGATimestamp() >= (startTime
-								+ timeoutValueToLift / 2.0))
-						{
-							// 8// if (visionSecond()) {
-							visionAngle = ahrs.getAngle();
-							state = State.PLACE_GEAR;
-							startTime = Timer.getFPGATimestamp();
-							left1.setPosition(0);
-							
-						}
-						
-					
-						else {
-						driveStyle.arcadeDrive(0, 0, false);
-						System.out.println("PROBLEM");
-					}
-					}
+//				else if(state == State.VISION_ALIGNMENT ){
+//					if (visionAlignment())
+//						{
+//							visionAngle = ahrs.getAngle();
+//							state = State.VISION_SECOND;
+//							startTime = Timer.getFPGATimestamp();
+//						}
+//	
+//					}
+//				else if (state == State.VISION_SECOND) {
+//	
+//						if (Timer.getFPGATimestamp() >= (startTime
+//								+ timeoutValueToLift / 2.0))
+//						{
+//							// 8// if (visionSecond()) {
+//							visionAngle = ahrs.getAngle();
+//							state = State.PLACE_GEAR;
+//							startTime = Timer.getFPGATimestamp();
+//							left1.setPosition(0);
+//							
+//						}
+//						
+//					
+//						else {
+//						driveStyle.arcadeDrive(0, 0, false);
+//						System.out.println("PROBLEM");
+//					}
+//					}
 				else if (state == State.PLACE_GEAR)
 				{
 					if (Timer.getFPGATimestamp() >= (startTime
-							+ timeOutValueSecondMove * 2))
+							/*+ timeOutValueSecondMove * 2*/))
 					{
 
+						placeGearAutoStop(gear);
 						startTime = Timer.getFPGATimestamp();
 						state = State.BACK_UP;
 
 					}
-					else if (Timer.getFPGATimestamp() >= (startTime
-							+ timeoutValueToLift / 4))
-					{
+//					else if (Timer.getFPGATimestamp() >= (startTime
+//							+ timeoutValueToLift / 4))
+//					{
+//						placeGearAuto(gear);
+//					}
+					else{
 						placeGearAuto(gear);
 					}
 				}
@@ -391,7 +396,6 @@ public class Drive
 						right1.set(0);
 						left1.set(0);
 						state = State.DONE;
-						startTime = Timer.getFPGATimestamp();
 						System.out.println("dun!");
 						System.out.println(Timer.getFPGATimestamp());
 						ahrs.zeroYaw();
@@ -403,7 +407,7 @@ public class Drive
 					}
 				}
 				break;
-			default:
+				
 			case GEAR_PLACEMENT_DREAM:
 
 				if (state == State.INIT)
@@ -503,6 +507,7 @@ public class Drive
 
 				}
 				break;
+				default:
 		}
 	}
 
@@ -649,8 +654,7 @@ public class Drive
 		}
 		// moveValue = smoothMove(moveValue);
 
-		driveStyle.arcadeDrive(moveValue, rotateValue, true);
-
+		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 	}
 
 	private boolean turnAuto(int optimalAngle)
@@ -714,7 +718,11 @@ public class Drive
 		gear.gearArmSet(0.5);
 
 	}
-
+	private void placeGearAutoStop(Gear gear)
+	{
+		gear.gearClawSet(0);
+		gear.gearArmSet(0);
+	}
 	private void moveGearUp(Gear gear)
 	{
 
@@ -852,7 +860,6 @@ public class Drive
 			chessyDriveAuto(speedByTime, rotateValue);
 		}
 	}
-
 	// private void changeDriveStyle() {
 	// newButtonValue = joystick1.getRawButton(RobotMap.BUTTON);
 	//
@@ -871,15 +878,35 @@ public class Drive
 	// }
 	// }
 
-	private double smoothMove(double value)
+	private double smoothMove(double _value)
 	{
-		double newEMA = value;
-		if(value > .3){
-			double smoothFactor = 2.0 / (ConstantMap.timePeriodSF + 1);
-			newEMA = oldEMA + smoothFactor * (value - oldEMA);	
+		double value = _value;
+		if((value > 0) && (oldEMA < -xSpeedDeadBand)) //|| ((value < 0) && (oldEMA > 0))){
+		{
+			// we're tipping!! 
+			value = 0;
+			timePeriodSF = kHighSmooth;
+			System.out.println("Tipping forward");
+		}
+	else if ((value < 0) && (oldEMA > xSpeedDeadBand))
+	{// we're tipping!! 
+		value = 0;
+		timePeriodSF = kHighSmooth;
+		System.out.println("tipping backward");
+	}
+		
+	    double smoothFactor = 2.0 / (timePeriodSF + 1);
+		value = oldEMA + smoothFactor * (value - oldEMA);
+		
+		if(Math.abs(oldEMA) < xSpeedDeadBand){
+			timePeriodSF = kLowSmooth;
 		}
 		
-		oldEMA = newEMA;
-		return newEMA;
-	}
+		oldEMA = value;
+		SmartDashboard.putNumber("smooth", value);
+		return value;
+}
+	
+	
+	
 }
