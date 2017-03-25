@@ -29,6 +29,7 @@ public final class RobotMap {
 		public static int FUEL_LOAD_STATION_ROLLER_MOTOR = 5;
 		public static int FUEL_CONVEYOR_ROLLER_MOTOR = 7; 
 		public static int FUEL_LOAD_STATION_GUIDE_MOTOR = 8;
+		public static int FUEL_LOAD_STATION_MOTOR = 4;
 	// Button IDs
 
 		// Button 5 collects the fuel from the load station

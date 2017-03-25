@@ -3,12 +3,14 @@ package org.usfirst.frc.team2228.robot;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Fuel {
+//	private Servo loadStationServo;
 	private Spark guide;
 	private Joystick joystick;
 	private Joystick joystick2;
@@ -59,7 +61,7 @@ public class Fuel {
 		conveyorOn = false;
 		pdp = pdpCurrent;
 		joystick = joy;
-		// joystick2 = joy;
+//		loadStationServo = new Servo(RobotMap.FUEL_LOAD_STATION_MOTOR);
 		fuelFurnaceRoller = new VictorSP(RobotMap.FUEL_FURNACE_ROLLER_MOTOR);
 		fuelLoadStationRoller = new VictorSP(RobotMap.FUEL_LOAD_STATION_ROLLER_MOTOR);
 		fuelConveyorRoller = new VictorSP(RobotMap.FUEL_CONVEYOR_ROLLER_MOTOR);
