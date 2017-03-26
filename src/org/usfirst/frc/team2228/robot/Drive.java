@@ -129,6 +129,7 @@ public class Drive {
 		System.out.println("We are in AutoInit");
 		right1.setPosition(0);
 		left1.setPosition(0);
+		visionAngle = 0;
 
 		switch (autoSelected) {
 
@@ -200,9 +201,10 @@ public class Drive {
 		case GEAR_AND_FUEL_PLACEMENT_LEFT:
 			System.out.println("Gear and Fuel Placement Left");
 			// turnAngle = 60;
-			timeOutValueSecondMove = 8;
+			timeOutValueSecondMove = 5;
 			autoGoal = Goal.GEAR_AND_FUEL_PLACEMENT_LEFT;
 			state = State.INIT;
+			currentAngle = -4.5;	//turns 4 degrees to the left
 			break;
 		default:
 
@@ -281,7 +283,7 @@ public class Drive {
 				state = State.DISPENSE_DA_FUEL;
 				startTime = Timer.getFPGATimestamp();
 				startTime += 3.0;
-				gear.gearClawSet(.4);
+				gear.gearClawSet(-.4);
 			} else if (state == State.DISPENSE_DA_FUEL) {
 				if (Timer.getFPGATimestamp() >= startTime) {
 					System.out.println("Move to Lift");
@@ -294,19 +296,7 @@ public class Drive {
 
 			}
 
-			// else if (state == State.WAIT_FOR_TIME)
-			// {
-			// if (Timer.getFPGATimestamp() >= (startTime + timeoutValue))
-			// {
-			// right1.set(0);
-			// left1.set(0);
-			// state = State.MOVE_TO_LIFT;
-			// }
-			// else
-			// {
-			// chessyDriveAuto(-0.33, 0);
-			// }
-			// }
+			
 			else if (state == State.MOVE_TO_LIFT) {
 				if (Timer.getFPGATimestamp() >= (startTime + 6.0)) {
 					System.out.println("Vision Alignment");
@@ -319,39 +309,14 @@ public class Drive {
 					right1.set(0);
 					left1.set(0);
 					state = State.PLACE_GEAR;
+					startTime = Timer.getFPGATimestamp();
 				} else {
 					chessyDriveAuto(-0.33, 0);
 				}
 
 			}
-			// else if(state == State.VISION_ALIGNMENT ){
-			// if (visionAlignment())
-			// {
-			// visionAngle = ahrs.getAngle();
-			// state = State.VISION_SECOND;
-			// startTime = Timer.getFPGATimestamp();
-			// }
-			//
-			// }
-			// else if (state == State.VISION_SECOND) {
-			//
-			// if (Timer.getFPGATimestamp() >= (startTime
-			// + timeoutValueToLift / 2.0))
-			// {
-			// // 8// if (visionSecond()) {
-			// visionAngle = ahrs.getAngle();
-			// state = State.PLACE_GEAR;
-			// startTime = Timer.getFPGATimestamp();
-			// left1.setPosition(0);
-			//
-			// }
-			//
-			//
-			// else {
-			// driveStyle.arcadeDrive(0, 0, false);
-			// System.out.println("PROBLEM");
-			// }
-			// }
+			
+			
 			else if (state == State.PLACE_GEAR) {
 				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove)) {
 					right1.setPosition(0);
@@ -361,11 +326,7 @@ public class Drive {
 					state = State.BACK_UP;
 
 				}
-				// else if (Timer.getFPGATimestamp() >= (startTime
-				// + timeoutValueToLift / 4))
-				// {
-				// placeGearAuto(gear);
-				// }
+				
 				else {
 					placeGearAuto(gear);
 				}
@@ -379,6 +340,7 @@ public class Drive {
 					ahrs.zeroYaw();
 				} else {
 					// chessyDriveAuto(-0.5, 0);
+					
 					moveAwayLift(visionAngle);
 				}
 			}
