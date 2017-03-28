@@ -73,7 +73,7 @@ public class Drive {
 	public Goal autoGoal;
 
 	public enum State {
-		INIT, WAIT_FOR_TIME, DONE, TURN, GEAR_PLACEMENT, VISION_ALIGNMENT, VISION_SECOND, MOVE_TO_LIFT, PLACE_GEAR, BACK_UP, DISPENSE_DA_FUEL
+		INIT, WAIT_FOR_TIME, DONE, TURN, GEAR_PLACEMENT, VISION_ALIGNMENT, VISION_SECOND, MOVE_TO_LIFT, PLACE_GEAR, BACK_UP, DISPENSE_DA_FUEL, INITIAL_TURN, SECOND_TURN, MOVE_FORWARD_90
 	}
 
 	public State state;
@@ -201,10 +201,10 @@ public class Drive {
 		case GEAR_AND_FUEL_PLACEMENT_LEFT:
 			System.out.println("Gear and Fuel Placement Left");
 			// turnAngle = 60;
-			timeOutValueSecondMove = 5;
+			timeOutValueSecondMove = 2;
 			autoGoal = Goal.GEAR_AND_FUEL_PLACEMENT_LEFT;
 			state = State.INIT;
-			currentAngle = -4.5;	//turns 4 degrees to the left
+			currentAngle = -4.5; // turns 4 degrees to the left
 			break;
 		default:
 
@@ -288,15 +288,69 @@ public class Drive {
 				if (Timer.getFPGATimestamp() >= startTime) {
 					System.out.println("Move to Lift");
 					fuelClass.fuelDischargeStop();
-					state = State.MOVE_TO_LIFT;
+					state = State.INITIAL_TURN;
 					startTime = Timer.getFPGATimestamp();
 				} else {
 					fuelClass.dischargeFuel();
 				}
 
-			}
+			} else if (state == State.INITIAL_TURN) {
+				if (turnAuto(-16)) {
+					SmartDashboard.putBoolean("Turned", true);
+					startTime = Timer.getFPGATimestamp();
+					state = State.MOVE_FORWARD_90;
+					left1.setPosition(0);
+					right1.setPosition(0);
+					ahrs.zeroYaw();
+				}
+				if (Timer.getFPGATimestamp() >= startTime + 5) {
+					state = State.MOVE_FORWARD_90;
+					left1.setPosition(0);
+					right1.setPosition(0);
+					startTime = Timer.getFPGATimestamp();
+					ahrs.zeroYaw();
+					SmartDashboard.putBoolean("Turned", false);
+				}
 
-			
+			} else if (state == State.MOVE_FORWARD_90) {
+				if (Timer.getFPGATimestamp() >= (startTime + 6.0)) {
+					
+					right1.set(0);
+					left1.set(0);
+					left1.setPosition(0);
+					right1.setPosition(0);
+					state = State.SECOND_TURN;
+					startTime = Timer.getFPGATimestamp();
+				} else if (Math.abs(left1.getPosition()) >= ((84 - 5) * ConstantMap.FAST_COUNTS_INCH)) {
+					System.out.println("Encoder Stop");
+					right1.set(0);
+					left1.set(0);
+					left1.setPosition(0);
+					right1.setPosition(0);
+					state = State.SECOND_TURN;
+					startTime = Timer.getFPGATimestamp();
+				} else {
+					chessyDriveAuto(-.33, 0);
+				}
+
+			}
+			else if(state == State.SECOND_TURN){
+				if (turnAuto(45)) {
+
+					startTime = Timer.getFPGATimestamp();
+					state = State.MOVE_TO_LIFT;
+					left1.setPosition(0);
+					right1.setPosition(0);
+					ahrs.zeroYaw();
+				}
+				if (Timer.getFPGATimestamp() >= startTime + 3) {
+					state = State.MOVE_TO_LIFT;
+					left1.setPosition(0);
+					right1.setPosition(0);
+					startTime = Timer.getFPGATimestamp();
+					ahrs.zeroYaw();
+				}
+			}
 			else if (state == State.MOVE_TO_LIFT) {
 				if (Timer.getFPGATimestamp() >= (startTime + 6.0)) {
 					System.out.println("Vision Alignment");
@@ -304,29 +358,30 @@ public class Drive {
 					left1.set(0);
 					state = State.PLACE_GEAR;
 					startTime = Timer.getFPGATimestamp();
-				} else if (Math.abs(left1.getPosition()) >= ((128 - 5) * ConstantMap.FAST_COUNTS_INCH)) {
+				} else if (Math.abs(left1.getPosition()) >= ((48 - 5) * ConstantMap.FAST_COUNTS_INCH)) {
 					System.out.println("Encoder Stop");
 					right1.set(0);
 					left1.set(0);
 					state = State.PLACE_GEAR;
 					startTime = Timer.getFPGATimestamp();
 				} else {
-					chessyDriveAuto(-0.33, 0);
+					chessyDriveAuto(-.33, 0);
+//					visionMoveToLift(currentAngle);
 				}
 
 			}
-			
-			
+
 			else if (state == State.PLACE_GEAR) {
 				if (Timer.getFPGATimestamp() >= (startTime + timeOutValueSecondMove)) {
 					right1.setPosition(0);
 					left1.setPosition(0);
 					placeGearAutoStop(gear);
 					startTime = Timer.getFPGATimestamp();
+					visionAngle = ahrs.getAngle();
 					state = State.BACK_UP;
 
 				}
-				
+
 				else {
 					placeGearAuto(gear);
 				}
@@ -339,8 +394,6 @@ public class Drive {
 					System.out.println(Timer.getFPGATimestamp());
 					ahrs.zeroYaw();
 				} else {
-					// chessyDriveAuto(-0.5, 0);
-					
 					moveAwayLift(visionAngle);
 				}
 			}
@@ -453,9 +506,7 @@ public class Drive {
 			gearValue -= speedDecrease;
 			pressed = true;
 
-		} else if (!(joystick1.getRawAxis(3) > .8 || joystick1.getRawAxis(2) > .8))
-
-		{
+		} else if (!(joystick1.getRawAxis(3) > .8 || joystick1.getRawAxis(2) > .8)) {
 			pressed = false;
 		}
 
@@ -581,6 +632,48 @@ public class Drive {
 
 	}
 
+	private void visionMoveToLift(double navxAngle) {
+
+		double rotateValue = 0;
+		double moveValue = -.2;
+		double centerX = SmartDashboard.getNumber("CenterX", 0.0);
+		SmartDashboard.putNumber("fuelAutoCenterX", centerX);
+
+		if (centerX == 0.0) {
+			chessyDriveAuto(moveValue, 0);
+			SmartDashboard.putBoolean("using chessy", true);
+
+		} else if (centerX > 210.0 || centerX < 110.0) {
+			if (rotateValue < 0.1 && rotateValue > -0.1) {
+
+				if (ahrs.getAngle() > 1 + navxAngle)
+					rotateValue += rotateIncrease;
+
+				else if (ahrs.getAngle() < -1 + navxAngle)
+					rotateValue -= rotateDecrease;
+			}
+
+			SmartDashboard.putBoolean("using CenterX", false);
+			SmartDashboard.putBoolean("using chessy", false);
+		}
+
+		else {
+			if (centerX > 170)
+				rotateValue += rotateIncrease;
+
+			else if (centerX < 150)
+				rotateValue -= rotateIncrease;
+			SmartDashboard.putBoolean("using CenterX", true);
+			SmartDashboard.putBoolean("using chessy", false);
+
+		}
+
+		// gear.gearArmSet(-.5);
+		SmartDashboard.putNumber("autoRotateValue", rotateValue);
+		driveStyle.arcadeDrive(moveValue, rotateValue, false);
+
+	}
+
 	private void placeGearAuto(Gear gear) {
 
 		gear.gearClawSet(0.3);
@@ -700,23 +793,6 @@ public class Drive {
 			chessyDriveAuto(speedByTime, rotateValue);
 		}
 	}
-	// private void changeDriveStyle() {
-	// newButtonValue = joystick1.getRawButton(RobotMap.BUTTON);
-	//
-	// if (newButtonValue != oldButtonValue) {
-	// if (newButtonValue == true) {
-	// if (driveType == false) {
-	// // driveStyle.arcadeDrive(joystick2, 1, joystick1, 0);
-	// driveType = true;
-	// } else {
-	// // driveStyle.tankDrive(joystick1, joystick2);
-	// driveType = false;
-	// }
-	//
-	// }
-	// oldButtonValue = newButtonValue;
-	// }
-	// }
 
 	private double smoothMove(double _value) {
 		double value = _value;

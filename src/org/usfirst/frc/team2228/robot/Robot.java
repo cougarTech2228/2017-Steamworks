@@ -97,7 +97,7 @@ public class Robot extends IterativeRobot {
 		grip = new GripPipeline();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		// UsbCamera cam2 =
+		UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture();
 		// CameraServer.getInstance().startAutomaticCapture("cam4", 1);
 		camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 
