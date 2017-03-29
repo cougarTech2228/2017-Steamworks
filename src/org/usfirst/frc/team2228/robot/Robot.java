@@ -13,6 +13,7 @@ import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -40,7 +41,6 @@ public class Robot extends IterativeRobot {
 	private Fuel fuel;
 	private Climb climb;
 	private Drive drive;
-
 	private PowerDistributionPanel pdp;
 
 	SendableChooser<ConstantMap.AutoChoices> chooser = new SendableChooser<>();
@@ -56,6 +56,7 @@ public class Robot extends IterativeRobot {
 
 	private double panAngle;
 	private double tiltAngle;
+
 	/*
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -64,13 +65,15 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		chooser.addObject("Do Nothing", ConstantMap.AutoChoices.DO_NOTHING);
-		chooser.addObject("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
-		chooser.addObject("Left Gear Placement", ConstantMap.AutoChoices.LEFT_GEAR_PLACEMENT);
-		chooser.addObject("Right Gear Placement", ConstantMap.AutoChoices.RIGHT_GEAR_PLACEMENT);
-		chooser.addObject("Left Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
-		chooser.addObject("Right Gear w/vision", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
-		chooser.addDefault("Center Gear Vision", ConstantMap.AutoChoices.CENTER_GEAR_PLACEMENT);
-		chooser.addDefault("Center", ConstantMap.AutoChoices.CENTER);
+		chooser.addDefault("Base Line", ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
+		chooser.addObject("LEFT SIDE BLUE GEAR", ConstantMap.AutoChoices.VISION_GEAR_LEFT);
+		chooser.addObject("RIGHT SIDE RED GEAR", ConstantMap.AutoChoices.VISION_GEAR_RIGHT);
+		// chooser.addDefault("Center Gear Vision",
+		// ConstantMap.AutoChoices.CENTER_GEAR_PLACEMENT);
+		chooser.addObject("CENTER", ConstantMap.AutoChoices.GEAR_PLACEMENT_DREAM);
+		// chooser.addDefault("Center", ConstantMap.AutoChoices.CENTER);
+		chooser.addObject("GEAR AND FUEL PLACEMENT LEFT", ConstantMap.AutoChoices.GEAR_AND_FUEL_PLACEMENT_LEFT);
+		chooser.addObject("Drive to the Pin", ConstantMap.AutoChoices.DRIVE_TO_DA_PIN);
 
 		SmartDashboard.putData("Auto choices", chooser);
 
@@ -82,16 +85,20 @@ public class Robot extends IterativeRobot {
 		fuel = new Fuel(joystick, pdp);
 
 		gear = new Gear(joystick);
-		drive = new Drive(joystick, gear);
+		drive = new Drive(joystick, gear, fuel);
 		climb = new Climb(joystick, pdp);
 
 		pan = new Servo(3);
 		tilt = new Servo(4);
+		pan.setAngle(110);
+		tilt.setAngle(140);
 		SmartDashboard.putNumber("CenterX", 0);
 
 		grip = new GripPipeline();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture();
+		// CameraServer.getInstance().startAutomaticCapture("cam4", 1);
 		camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
 
 		visionThread = new VisionThread(camera, grip, grip -> {
@@ -120,6 +127,7 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("CenterX", centerX);
 			}
 		});
+
 		visionThread.start();
 
 	}
@@ -153,11 +161,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
 		climb.teleopPeriodic();
-		fuel.teleopPeriodic();
-		gear.teleopPeriodic();
+		// fuel.teleopPeriodic();
+		gear.teleopPeriodic(fuel);
 
 		// fuel.teleopPeriodic();
 
@@ -165,6 +174,16 @@ public class Robot extends IterativeRobot {
 		synchronized (imgLock) {
 			centerX = this.centerX;
 		}
+
+		fuel.fuelCollectLoadingStation();
+
+		if (joystick.getRawButton(7)) {
+			fuel.dischargeFuel();
+		} else {
+			fuel.fuelFurnaceRollerSet(0);
+		}
+
+		fuel.collectFuelFloor();
 
 		if (joystick.getPOV() == 270 && panAngle < 150) {
 

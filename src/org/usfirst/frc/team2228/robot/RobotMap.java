@@ -13,9 +13,9 @@ public final class RobotMap {
 		public static int GEAR_LOAD_STATION_GUIDE = 9;
 
 		// Button 3 releases the gear
-		public static int BUTTON_3_RELEASE_THE_GEAR = 2;
+		public static int BUTTON_3_RELEASE_THE_GEAR = 3;
 		// Button 2 collects the gear
-		public static int BUTTON_2_COLLECT_THE_GEAR = 3;
+		public static int BUTTON_2_COLLECT_THE_GEAR = 2;
 		// Button 4 moves the arm down
 		public static int BUTTON_5_MOVE_ARM_DOWN = 5;
 		// Button 1 moves the arm up
@@ -29,6 +29,7 @@ public final class RobotMap {
 		public static int FUEL_LOAD_STATION_ROLLER_MOTOR = 5;
 		public static int FUEL_CONVEYOR_ROLLER_MOTOR = 7; 
 		public static int FUEL_LOAD_STATION_GUIDE_MOTOR = 8;
+		public static int FUEL_LOAD_STATION_MOTOR = 4;
 	// Button IDs
 
 		// Button 5 collects the fuel from the load station
@@ -40,7 +41,7 @@ public final class RobotMap {
 
 // Drive
 	// CANTalon ID's
-		public static int RIGHT_ONE_DRIVE = 1;
+		public static int RIGHT_ONE_DRIVE = 1;														
 		public static int RIGHT_TWO_DRIVE = 2;
 		public static int LEFT_ONE_DRIVE = 3;
 		public static int LEFT_TWO_DRIVE = 4;
