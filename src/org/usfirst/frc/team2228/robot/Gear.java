@@ -5,6 +5,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,6 +15,14 @@ public class Gear
 	private CANTalon gearJaw;
 	private boolean loadingActivated;
 	private Spark guide;
+	private Servo servo1;
+	private Servo servo2;
+	private double servoAngle1;
+	private double minServoAngle1;
+	private double maxServoAngle1;
+	private double servoAngle2;
+	private double minServoAngle2;
+	private double maxServoAngle2;
 	private boolean firstGearGuideCollectionValue = false;
 	private boolean lastGearGuideCollectionValue = false;
 	private boolean guideOpen;
@@ -22,7 +31,7 @@ public class Gear
 	private boolean moveGearArmDown = false;
 	private boolean gearGraspRelease = false;
 	private boolean gearGuideCollect = false;
-	private double open ;
+	private double open;
 	private double guideUp = 0.4;
 	private double guideDown = -0.4;
 	private Joystick joystick;
@@ -48,11 +57,17 @@ public class Gear
 	private DigitalInput fwdLimitSwitch;
 	private DigitalInput revLimitSwitch;
 	private int potentiometerMax = 0;
-//	private DigitalInput gearDetector;
+	// private DigitalInput gearDetector;
 
 	// Constructor
 	public Gear(Joystick joy)
 	{
+		servo1 = new Servo(0);
+		servo2 = new Servo(1);
+		minServoAngle1 = 0;
+		maxServoAngle1 = 180;
+		minServoAngle2 = 0;
+		maxServoAngle2 = 180;
 		guide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
 		joystick = joy;
 		gearArm = new CANTalon(RobotMap.GEAR_ARM);
@@ -67,7 +82,7 @@ public class Gear
 
 		fwdLimitSwitch = new DigitalInput(6);
 		revLimitSwitch = new DigitalInput(7);
-//		gearDetector = new DigitalInput(5);
+		// gearDetector = new DigitalInput(5);
 		loadingActivated = false;
 	}
 
@@ -84,68 +99,118 @@ public class Gear
 	}
 
 	// Called continuously during the teleop period
-	public void teleopPeriodic(Fuel fuel) {
-		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
-		gearGraspRelease = joystick.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
-		if (gearCollection) {
+	public void teleopPeriodic(Fuel fuel)
+	{
+		gearCollection = joystick
+				.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
+		gearGraspRelease = joystick
+				.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
+		if (gearCollection)
+		{
 			gearJaw.set(gearCollectionValue);
-		} else if (gearGraspRelease) {
+		}
+		else if (gearGraspRelease)
+		{
 			gearJaw.set(gearReleaseValue);
-		} else {
+		}
+		else
+		{
 			gearJaw.set(0);
 		}
 
 		moveGearArmUp = joystick.getRawButton(RobotMap.BUTTON_6_MOVE_ARM_UP);
-		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
+		moveGearArmDown = joystick
+				.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
 
-		if (moveGearArmUp) {
-			if(gearArm.isRevLimitSwitchClosed()){
-//				gearArm.set(0);
-			}else{
+		if (moveGearArmUp)
+		{
+			if (gearArm.isRevLimitSwitchClosed())
+			{
+				// gearArm.set(0);
+			}
+			else
+			{
 				gearArm.set(armUp);
 			}
 			// gearJaw.set(gearCollectionValue);
-		} else if (moveGearArmDown) {
+		}
+		else if (moveGearArmDown)
+		{
 			gearArm.set(armDown);
 			// gearJaw.set(gearCollectionValue);
-		} else {
+		}
+		else
+		{
 			gearArm.set(0);
 			// leftGearCollector.set(0);
 			// gearCollector.set(0);
 		} //
-		
-		gearGuideCollect = joystick.getRawButton(RobotMap.BUTTON_1_GEAR_COLLECTION);
 
-		
-		if(gearGuideCollect){
-			if(revLimitSwitch.get()){
+		gearGuideCollect = joystick
+				.getRawButton(RobotMap.BUTTON_1_GEAR_COLLECTION);
+
+		if (gearGuideCollect)
+		{
+			if (servoAngle1 < maxServoAngle1)
+			{
+				servo1.set(maxServoAngle1);
+				;
+			}
+			if (servoAngle2 > minServoAngle2)
+			{
+				servo1.set(minServoAngle2);
+				;
+			}
+			servo1.set(servoAngle1);
+			servo2.set(servoAngle2);
+			if (revLimitSwitch.get())
+			{
 				guide.set(guideDown);
-			}else{
+
+			}
+			else
+			{
 				guide.set(0);
 			}
-		
+
 			fuel.fuelLoadStationRollerSet(rollerVelocity);
-			if(/*gearArm.isFwdLimitSwitchClosed()*/ potentiometerArm.getValue() >= 500){
+			if (/* gearArm.isFwdLimitSwitchClosed() */ potentiometerArm
+					.getValue() >= 500)
+			{
 				gearJaw.set(gearJawOpenValue);
 				gearArmSet(0);
-			}else{
-				gearArm.set(armUp);
-				gearJaw.set(gearJawCloseValue*2);
 			}
-		
-		}else{
-			
-			if(fwdLimitSwitch.get()){
+			else
+			{
+				gearArm.set(armUp);
+				gearJaw.set(gearJawCloseValue * 2);
+			}
+
+		}
+		else
+		{
+			if (servoAngle1 > minServoAngle1)
+			{
+				servo1.set(minServoAngle1);
+			}
+			if (servoAngle2 < maxServoAngle2)
+			{
+				servo2.set(maxServoAngle2);
+			}
+			if (fwdLimitSwitch.get())
+			{
 				guide.set(guideUp);
 				fuel.fuelLoadStationRollerSet(0);
 
-			}else{
+			}
+			else
+			{
 				guide.set(0);
 			}
 			loadingActivated = false;
-			
+
 		}
-		
+
 		// if (firstGearGuideCollectionValue != lastGearGuideCollectionValue) {
 		// if(firstGearGuideCollectionValue){
 		// if(!guideOpen){
@@ -156,12 +221,10 @@ public class Gear
 		// `}
 		// }
 		// }
-		
-		
-		SmartDashboard.putNumber("Pot1", potentiometerArm.getValue());
-	//	SmartDashboard.putNumber("Pot2", potentiometerJaw.getValue());
-//		SmartDashboard.putBoolean("da gear is dere", gearDetector.get());
 
+		SmartDashboard.putNumber("Pot1", potentiometerArm.getValue());
+		// SmartDashboard.putNumber("Pot2", potentiometerJaw.getValue());
+		// SmartDashboard.putBoolean("da gear is dere", gearDetector.get());
 
 	}
 
@@ -178,9 +241,12 @@ public class Gear
 
 	public void gearArmSet(double vel)
 	{
-		if(vel > 0 && potentiometerArm.getValue()>potentiometerMax){
+		if (vel > 0 && potentiometerArm.getValue() > potentiometerMax)
+		{
 			gearArm.set(vel);
-		}else if(vel < 0){
+		}
+		else if (vel < 0)
+		{
 			gearArm.set(vel);
 		}
 		// gearJaws.set(vel);
@@ -188,7 +254,8 @@ public class Gear
 
 	public void raiseTheArm()
 	{
-		if (gearArm.isFwdLimitSwitchClosed() && potentiometerArm.getValue()>potentiometerMax)
+		if (gearArm.isFwdLimitSwitchClosed()
+				&& potentiometerArm.getValue() > potentiometerMax)
 		{
 			gearArmSet(armUp);
 

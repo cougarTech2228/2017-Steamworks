@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
@@ -119,6 +118,7 @@ public class Drive
 
 		try
 		{
+
 			ahrs = new AHRS(SPI.Port.kOnboardCS0);
 		}
 		catch (RuntimeException ex)
@@ -180,7 +180,7 @@ public class Drive
 			case CENTER_GEAR_PLACEMENT:
 				System.out.println("Center Gear Placement");
 				turnAngle = 0;
-				timeOutValueSecondMove = .6;
+				timeOutValueSecondMove = .1;
 				autoGoal = Goal.TURN_GEAR_PLACEMENT;
 				state = State.INIT;
 				break;
@@ -204,7 +204,7 @@ public class Drive
 			case GEAR_PLACEMENT_DREAM:
 				System.out.println("Gear Placement Dream");
 				turnAngle = -0;
-				timeOutValueSecondMove = .6;
+				timeOutValueSecondMove = .2;
 				autoGoal = Goal.GEAR_PLACEMENT_DREAM;
 				state = State.INIT;
 				break;
@@ -212,17 +212,17 @@ public class Drive
 				System.out.println("Gear and Fuel Placement Left");
 				angleDirection1 = -1;
 				angleDirection2 = 1;
-				
-				timeOutValueSecondMove = .5;
+
+				timeOutValueSecondMove = .3;
 				autoGoal = Goal.GEAR_AND_FUEL_PLACEMENT;
 				state = State.INIT;
 				currentAngle = -4.5; // turns 4 degrees to the left
 				break;
 			case GEAR_AND_FUEL_PLACEMENT_RIGHT:
-				System.out.println("Gear and Fuel Placement Left");
+				System.out.println("Gear and Fuel Placement Right");
 				angleDirection1 = 1;
 				angleDirection2 = -1;
-				timeOutValueSecondMove = .5;
+				timeOutValueSecondMove = .3;
 				autoGoal = Goal.GEAR_AND_FUEL_PLACEMENT;
 				state = State.INIT;
 				currentAngle = -4.5; // turns 4 degrees to the left
@@ -245,8 +245,9 @@ public class Drive
 			case DO_NOTHING:
 				break;
 			case DRIVE_FORWARD:
+
 				// Subtract 5 because of a slight coast
-				if (Math.abs(left1.getPosition()) >= (120 - 5)
+				if (Math.abs(left1.getPosition()) >= (120)
 						* ConstantMap.FAST_COUNTS_INCH)
 				{
 					right1.set(0);
@@ -255,7 +256,7 @@ public class Drive
 				}
 				else
 				{
-					chessyDriveAuto(-0.25, 0);
+					chessyDriveAuto(-0.33, 0);
 				}
 				break;
 
@@ -280,7 +281,7 @@ public class Drive
 						 * length of the bot from the 110 inches taht it has to
 						 * travel // as well as the -5 because of the slight
 						 * coast
-						 */Math.abs(left1.getPosition()) > (72 - 5)
+						 */Math.abs(left1.getPosition()) > (82)
 							* ConstantMap.FAST_COUNTS_INCH)
 					{
 						right1.set(0);
@@ -332,6 +333,7 @@ public class Drive
 					}
 					else
 					{
+						fuelClass.collectFuel();
 						fuelClass.dischargeFuel();
 					}
 
@@ -370,11 +372,12 @@ public class Drive
 						right1.setPosition(0);
 						state = State.SECOND_TURN;
 						startTime = Timer.getFPGATimestamp();
+						System.out.println("time Stop fwd_90");
 					}
-					else if (Math.abs(left1.getPosition()) >= ((80 - 5)
+					else if (Math.abs(left1.getPosition()) >= ((104 - 5)
 							* ConstantMap.FAST_COUNTS_INCH))
 					{
-						System.out.println("Encoder Stop");
+						System.out.println("Encoder Stop fwd_90");
 						right1.set(0);
 						left1.set(0);
 						left1.setPosition(0);
@@ -394,14 +397,14 @@ public class Drive
 					{
 
 						startTime = Timer.getFPGATimestamp();
-						state = State.MOVE_TO_VISION;
+						state = State.MOVE_TO_LIFT;
 						left1.setPosition(0);
 						right1.setPosition(0);
 						ahrs.zeroYaw();
 					}
 					if (Timer.getFPGATimestamp() >= startTime + 3)
 					{
-						state = State.MOVE_TO_VISION;
+						state = State.MOVE_TO_LIFT;
 						left1.setPosition(0);
 						right1.setPosition(0);
 						startTime = Timer.getFPGATimestamp();
@@ -441,6 +444,7 @@ public class Drive
 
 				else if (state == State.VISION_ALIGNMENT)
 				{
+
 					if (Timer.getFPGATimestamp() >= (startTime + .5))
 					{
 						double center1 = SmartDashboard.getNumber("CenterX",
@@ -450,19 +454,22 @@ public class Drive
 						state = State.MOVE_TO_LIFT;
 						right1.setPosition(0);
 						left1.setPosition(0);
+						startTime = Timer.getFPGATimestamp();
+						System.out.println("currentAngle " + currentAngle);
 					}
 				}
 
 				else if (state == State.MOVE_TO_LIFT)
 				{
+					SmartDashboard.putNumber("Time", startTime);
 					if (Timer.getFPGATimestamp() >= (startTime + 3.0))
 					{
-						System.out.println("Move to Lift");
+						System.out.println("Time out, Move to Lift");
 						right1.set(0);
 						left1.set(0);
 						left1.setPosition(0);
 						right1.setPosition(0);
-						state = State.PLACE_GEAR;
+						state = State.DONE;
 						startTime = Timer.getFPGATimestamp();
 					}
 					else if (Math.abs(left1.getPosition()) >= ((26 - 5)
@@ -473,7 +480,7 @@ public class Drive
 						left1.set(0);
 						left1.setPosition(0);
 						right1.setPosition(0);
-						state = State.PLACE_GEAR;
+						state = State.DONE;
 						startTime = Timer.getFPGATimestamp();
 					}
 					else
@@ -527,7 +534,7 @@ public class Drive
 				{
 					// ahrs.zeroYaw();
 					left1.setPosition(0);
-					state = State.WAIT_FOR_TIME;
+					state = State.MOVE_TO_LIFT;// Skipping vision for now :(
 					startTime = Timer.getFPGATimestamp();
 					System.out.println("Start:");
 					System.out.println(startTime);
@@ -535,48 +542,42 @@ public class Drive
 					gear.gearClawSet(-.4);
 
 				}
-				else if (state == State.WAIT_FOR_TIME)
-				{
-
-					if (Timer.getFPGATimestamp() >= (startTime + timeoutValue)
-							* 3
-							|| Math.abs(left1.getPosition()) > (41 - 5)
-									* ConstantMap.FAST_COUNTS_INCH)
-					{
-						System.out.println(left1.getPosition());
-						right1.set(0);
-						left1.set(0);
-						state = State.MOVE_TO_VISION;
-						startTime = Timer.getFPGATimestamp();
-						System.out.println(Timer.getFPGATimestamp());
-					}
-					else
-					{
-						chessyDriveAuto(-0.33, 0);
-					}
-
-				}
+				// else if (state == State.WAIT_FOR_TIME)
+				// {
+				//
+				// if (Timer.getFPGATimestamp() >= (startTime + timeoutValue)
+				// * 3
+				// || Math.abs(left1.getPosition()) > (41 - 5)
+				// * ConstantMap.FAST_COUNTS_INCH)
+				// {
+				// System.out.println(left1.getPosition());
+				// state = State.MOVE_TO_VISION;
+				// startTime = Timer.getFPGATimestamp();
+				// System.out.println(Timer.getFPGATimestamp());
+				// }
+				// else
+				// {
+				// chessyDriveAuto(-0.33, 0);
+				// }
+				//
+				// }
 				else if (state == State.MOVE_TO_VISION)
 				{
-					if (Timer.getFPGATimestamp() >= (startTime + 3.0))
+					if (Timer.getFPGATimestamp() >= (startTime + 3.0) * 2)
 					{
-						System.out.println("Move to vision position");
-						right1.set(0);
-						left1.set(0);
-						left1.setPosition(0);
-						right1.setPosition(0);
-						state = State.VISION_ALIGNMENT;
+						System.out.println("Timeout");
+						// driveStyle.arcadeDrive(-0.1, 0, false);
+						chessyDriveAuto(-0.1, 0);
+						state = State.MOVE_TO_LIFT;
 						startTime = Timer.getFPGATimestamp();
 					}
-					else if (Math.abs(left1.getPosition()) >= ((51 - 5)
+					else if (Math.abs(left1.getPosition()) >= ((62)
 							* ConstantMap.FAST_COUNTS_INCH))
 					{
 						System.out.println("Encoder Stop");
-						right1.set(0);
-						left1.set(0);
-						left1.setPosition(0);
-						right1.setPosition(0);
-						state = State.VISION_ALIGNMENT;
+						// driveStyle.arcadeDrive(-0.1, 0, false);
+						chessyDriveAuto(-0.1, 0);
+						state = State.MOVE_TO_LIFT;
 						startTime = Timer.getFPGATimestamp();
 					}
 					else
@@ -588,24 +589,25 @@ public class Drive
 				}
 
 				else if (state == State.VISION_ALIGNMENT)
+
 				{
 					if (Timer.getFPGATimestamp() >= (startTime + .5))
 					{
+
 						double center1 = SmartDashboard.getNumber("CenterX",
 								-1);
 						currentAngle = centerXToAngle(center1);
+						System.out.println("currentAngle is " + currentAngle);
 
 						state = State.MOVE_TO_LIFT;
-						right1.setPosition(0);
-						left1.setPosition(0);
 					}
 				}
 
 				else if (state == State.MOVE_TO_LIFT)
 				{
-					if (Timer.getFPGATimestamp() >= (startTime + 3.0))
+					if (Timer.getFPGATimestamp() >= (startTime + 6.0))
 					{
-						System.out.println("Move to Lift");
+						System.out.println("Move to Lift, Timed out");
 						right1.set(0);
 						left1.set(0);
 						left1.setPosition(0);
@@ -613,8 +615,8 @@ public class Drive
 						state = State.PLACE_GEAR;
 						startTime = Timer.getFPGATimestamp();
 					}
-					else if (Math.abs(left1.getPosition()) >= ((26 - 5)
-							* ConstantMap.FAST_COUNTS_INCH))
+					else if (Math.abs(left1.getPosition()) >= (110)
+							* ConstantMap.FAST_COUNTS_INCH)
 					{
 						System.out.println("Encoder Stop, move to lift");
 						right1.set(0);
@@ -650,7 +652,7 @@ public class Drive
 				}
 				else if (state == State.BACK_UP)
 				{
-					if (Math.abs(left1.getPosition()) > (28 - 5)
+					if (Math.abs(left1.getPosition()) > (28)
 							* ConstantMap.FAST_COUNTS_INCH)
 					{
 						right1.set(0);
@@ -693,7 +695,7 @@ public class Drive
 						 * Timer.getFPGATimestamp() >= (startTime +
 						 * timeoutValue)|| left1.getPosition() < -3125)
 						 */
-					Math.abs(left1.getPosition()) > (86 - 5)
+					Math.abs(left1.getPosition()) > (86)
 							* ConstantMap.FAST_COUNTS_INCH)
 					{
 						right1.set(0);
@@ -701,7 +703,9 @@ public class Drive
 						state = State.TURN;
 						startTime = Timer.getFPGATimestamp();
 						System.out.println(Timer.getFPGATimestamp());
+						System.out.println("Moving to baseline");
 					}
+
 					else
 					{
 						chessyDriveAuto(-0.33, 0);
@@ -719,7 +723,7 @@ public class Drive
 						{
 							startTime = Timer.getFPGATimestamp();
 
-							state = State.MOVE_TO_LIFT;
+							state = State.MOVE_TO_VISION;
 							left1.setPosition(0);
 						}
 
@@ -737,25 +741,22 @@ public class Drive
 				{
 					if (Timer.getFPGATimestamp() >= (startTime + 3.0))
 					{
-						System.out.println("Move to vision position");
-						right1.set(0);
-						left1.set(0);
-						left1.setPosition(0);
-						right1.setPosition(0);
+						System.out.println("Move to vision position timeout"
+								+ left1.getPosition());
+
+						chessyDriveAuto(-0.1, 0);
 						state = State.VISION_ALIGNMENT;
 						startTime = Timer.getFPGATimestamp();
 					}
-					else if (Math.abs(left1.getPosition()) >= ((65 - 5)
+					else if (Math.abs(left1.getPosition()) >= ((53)
 							* ConstantMap.FAST_COUNTS_INCH))
 					{
-						System.out.println("Encoder Stop");
-						right1.set(0);
-						left1.set(0);
-						left1.setPosition(0);
-						right1.setPosition(0);
+						System.out.println("Encoder Stop move to vision");
+						chessyDriveAuto(-0.1, 0);
 						state = State.VISION_ALIGNMENT;
 						startTime = Timer.getFPGATimestamp();
 					}
+
 					else
 					{
 						chessyDriveAuto(-.33, 0);
@@ -766,6 +767,7 @@ public class Drive
 
 				else if (state == State.VISION_ALIGNMENT)
 				{
+
 					if (Timer.getFPGATimestamp() >= (startTime + .5))
 					{
 						double center1 = SmartDashboard.getNumber("CenterX",
@@ -773,8 +775,12 @@ public class Drive
 						currentAngle = centerXToAngle(center1);
 
 						state = State.MOVE_TO_LIFT;
-						right1.setPosition(0);
-						left1.setPosition(0);
+						System.out.println("currentAngle" + currentAngle);
+						startTime = Timer.getFPGATimestamp();
+					}
+					else
+					{
+						chessyDriveAuto(-0.1, 0);
 					}
 				}
 
@@ -782,7 +788,7 @@ public class Drive
 				{
 
 					if// (left1.getPosition() < -3600
-					(Math.abs(left1.getPosition()) > (24 - 5)
+					(Math.abs(left1.getPosition()) > (89)
 							* ConstantMap.FAST_COUNTS_INCH
 							|| Timer.getFPGATimestamp() >= (startTime
 									+ timeoutValue * 5))
@@ -984,13 +990,13 @@ public class Drive
 			if (ahrs.getYaw() > 1.2 + currentAngle)
 			{
 
-				rotateValue += rotateIncrease;
+				rotateValue += .31;
 
 			}
 			else if (ahrs.getYaw() < -1.2 + currentAngle)
 			{
 
-				rotateValue -= rotateDecrease;
+				rotateValue -= .31;
 
 			}
 
@@ -999,6 +1005,31 @@ public class Drive
 
 		driveStyle.arcadeDrive(moveValue, rotateValue, false);
 	}
+	// public void chessyDriveAutosSlow(double moveValue, double rotateValue)
+	// {
+	//
+	// if (rotateValue < 0.1 && rotateValue > -0.1)
+	// {
+	//
+	// if (ahrs.getYaw() > 1.2 + currentAngle)
+	// {
+	//
+	// rotateValue += rotateIncrease;
+	//
+	// }
+	// else if (ahrs.getYaw() < -1.2 + currentAngle)
+	// {
+	//
+	// rotateValue -= rotateDecrease;
+	//
+
+	// }
+	//
+	// }
+	// // moveValue = smoothMove(moveValue);
+	//
+	// driveStyle.arcadeDrive(moveValue, rotateValue, false);
+	// }
 
 	private boolean turnAuto(int optimalAngle)
 	{
@@ -1086,7 +1117,10 @@ public class Drive
 
 		double angle = ((centerX - 160) / 160) * 25; // subtracts 160 because
 														// that is half of frame
-														// width (in pixels)
+
+		angle = angle * -1; // Because the camera is upside-down, remove if
+							// right-side-up
+		// width (in pixels)
 		if (angle < -25 || angle > 25)
 		{
 			angle = 0;
@@ -1261,13 +1295,13 @@ public class Drive
 			// we're tipping!!
 			value = 0;
 			timePeriodSF = kHighSmooth;
-			System.out.println("Tipping forward");
+			// System.out.println("Tipping forward");
 		}
 		else if ((value < 0) && (oldEMA > xSpeedDeadBand))
 		{// we're tipping!!
 			value = 0;
 			timePeriodSF = kHighSmooth;
-			System.out.println("tipping backward");
+			// System.out.println("tipping backward");
 		}
 
 		double smoothFactor = 2.0 / (timePeriodSF + 1);
