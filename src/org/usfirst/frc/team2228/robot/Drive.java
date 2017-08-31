@@ -17,6 +17,7 @@ import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 public class Drive
 {
 	private double xSpeedDeadBand = .1;
+	private double multiplier = 7/6; 
 	public static final int kLowSmooth = 5;
 	public static final int kHighSmooth = 35;
 	public int timePeriodSF = 35;
@@ -291,7 +292,8 @@ public class Drive
 					}
 					else
 					{
-						chessyDriveAuto(-0.33, 0);
+//						chessyDriveAuto(-0.33, 0);
+						driveStraightAuto(.3);
 					}
 
 					// } else if (state == State.MOVE_TO_LIFT) {
@@ -1316,5 +1318,18 @@ public class Drive
 		SmartDashboard.putNumber("smooth", value);
 		return value;
 	}
-
+	private void driveStraightAuto(double speed) {
+		left1.set(speed);
+		right1.set(-speed * multiplier );
+	}
+	private void turnRightAuto(double speed){
+		double rightspeed = speed * multiplier;
+		left1.set(speed);
+		right1.set(rightspeed);
+	}
+	private void turnLeftAuto(double speed){
+		double rightspeed = speed * multiplier;
+		left1.set(-speed);
+		right1.set(-rightspeed);
+	}
 }
