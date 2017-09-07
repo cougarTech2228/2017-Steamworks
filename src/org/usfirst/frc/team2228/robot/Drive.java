@@ -17,7 +17,7 @@ import org.usfirst.frc.team2228.robot.ConstantMap.AutoChoices;
 public class Drive
 {
 	private double xSpeedDeadBand = .1;
-	private double multiplier = 7/6; 
+	private double multiplier = 35.0/30.0; 
 	public static final int kLowSmooth = 5;
 	public static final int kHighSmooth = 35;
 	public int timePeriodSF = 35;
@@ -70,7 +70,7 @@ public class Drive
 
 	public enum Goal
 	{
-		DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT
+		TURN_LEFT, TURN_RIGHT, DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT
 	}
 
 	public Goal autoGoal;
@@ -143,7 +143,14 @@ public class Drive
 
 		switch (autoSelected)
 		{
-
+		case TURN_LEFT:
+			autoGoal = Goal.TURN_LEFT;
+			break;
+		
+		case TURN_RIGHT:
+			autoGoal = Goal.TURN_RIGHT;
+			break;
+			
 			case DO_NOTHING:
 				System.out.println("Do Nothing");
 				autoGoal = Goal.DO_NOTHING;
@@ -243,6 +250,26 @@ public class Drive
 
 		switch (autoGoal)
 		{
+		case TURN_LEFT:
+			if(right1.getPosition() >= 600){
+				turnRightAuto(0);
+			}
+			else{
+//			turnRightAuto(-.25);
+				right1.set(-.3);
+				left1.set(-.3);
+			}
+			break;
+		case TURN_RIGHT:
+			if(right1.getPosition() <= -600){
+				turnRightAuto(0);
+			}
+			else{
+//			turnRightAuto(.25);
+				right1.set(.3);
+				left1.set(.3);
+			}
+			break;
 			case DO_NOTHING:
 				break;
 			case DRIVE_FORWARD:
