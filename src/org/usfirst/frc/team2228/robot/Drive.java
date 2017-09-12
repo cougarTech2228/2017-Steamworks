@@ -70,7 +70,7 @@ public class Drive
 
 	public enum Goal
 	{
-		TURN_LEFT, TURN_RIGHT, DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT
+		TURN_LEFT, TURN_RIGHT, DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT, DRIVE_STRAIGHT_THEN_TURN
 	}
 
 	public Goal autoGoal;
@@ -143,6 +143,11 @@ public class Drive
 
 		switch (autoSelected)
 		{
+		case DRIVE_STRAIGHT_THEN_TURN:
+			autoGoal = Goal.DRIVE_STRAIGHT_THEN_TURN;
+			state = State.INIT;
+			break;
+		
 		case TURN_LEFT:
 			autoGoal = Goal.TURN_LEFT;
 			break;
@@ -250,6 +255,38 @@ public class Drive
 
 		switch (autoGoal)
 		{
+		case DRIVE_STRAIGHT_THEN_TURN:
+			if(state == State.INIT){
+			if(right1.getPosition() <= -600 * 3){
+				driveStraightAuto(0);
+				right1.setPosition(0);
+				startTime = Timer.getFPGATimestamp();
+				state = State.WAIT_FOR_TIME;
+			}
+			else{
+				driveStraightAuto(0.3);
+			}
+			}
+			else if (state == State.WAIT_FOR_TIME){
+				if(Timer.getFPGATimestamp() >= startTime + 0.5){
+					state = State.TURN;
+				}
+			}
+			
+			else if(state == State.TURN){
+				if(right1.getPosition() <= -600 * 2){
+					right1.set(0);
+					left1.set(0);
+					state = State.DONE;
+				}
+				else{
+					right1.set(-0.3 * multiplier * 1.5);
+					left1.set(0.3 * 0.5);
+				}
+			}
+			
+			break;
+		
 		case TURN_LEFT:
 			if(right1.getPosition() >= 600){
 				turnRightAuto(0);
@@ -303,26 +340,13 @@ public class Drive
 				else if (state == State.WAIT_FOR_TIME)
 				{
 
-					if (/*
-						 * Timer.getFPGATimestamp() >= (startTime +
-						 * timeoutValue)|| // 82 because of the 28 from the
-						 * length of the bot from the 110 inches taht it has to
-						 * travel // as well as the -5 because of the slight
-						 * coast
-						 */Math.abs(left1.getPosition()) > (82)
-							* ConstantMap.FAST_COUNTS_INCH)
+					if (driveStraightAutoWithInches(0.3, 82.0))
 					{
 						right1.set(0);
 						left1.set(0);
 						state = State.DONE;
 						startTime = Timer.getFPGATimestamp();
 					}
-					else
-					{
-//						chessyDriveAuto(-0.33, 0);
-						driveStraightAuto(.3);
-					}
-
 					// } else if (state == State.MOVE_TO_LIFT) {
 					//
 					// if (Timer.getFPGATimestamp() >= (startTime +
@@ -1348,6 +1372,17 @@ public class Drive
 	private void driveStraightAuto(double speed) {
 		left1.set(speed);
 		right1.set(-speed * multiplier );
+	}
+	private boolean driveStraightAutoWithInches(double speed, double inches){
+		boolean finished = false;
+		if(Math.abs(left1.getPosition()) > (inches - 5) * ConstantMap.FAST_COUNTS_INCH){
+			finished = true;
+		}
+		else{
+			left1.set(speed);
+			right1.set(-speed * multiplier);
+		}
+		return finished;
 	}
 	private void turnRightAuto(double speed){
 		double rightspeed = speed * multiplier;
