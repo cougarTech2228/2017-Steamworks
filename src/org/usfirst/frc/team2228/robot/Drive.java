@@ -70,7 +70,7 @@ public class Drive
 
 	public enum Goal
 	{
-		TURN_LEFT, TURN_RIGHT, DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT
+		TURN_LEFT, TURN_RIGHT, DO_NOTHING, TURN_GEAR_PLACEMENT, VISION_PLACEMENT, CENTER, BASE_LINE, GEAR_PLACEMENT, GEAR_PLACEMENT_DREAM, DRIVE_FORWARD, VISION_GEAR, GEAR_AND_FUEL_PLACEMENT, DRIVE_STRAIGHT_THEN_TURN, CENTER_GEAR_PLACEMENT
 	}
 
 	public Goal autoGoal;
@@ -99,17 +99,17 @@ public class Drive
 		// Create the RobotDrive object
 		driveStyle = new RobotDrive(right1, left1);
 		right1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		right1.enableBrakeMode(true);
 		left1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		left1.enableBrakeMode(true);
+		right1.enableBrakeMode(false);
+		right2.enableBrakeMode(false);
+		left1.enableBrakeMode(false);
+		left2.enableBrakeMode(false);
 		// Set left2 and right2 to follow the commands of left1 and left2
 		right2.changeControlMode(TalonControlMode.Follower);
 		right2.enableControl();
-		right2.enableBrakeMode(true);
 		right2.set(right1.getDeviceID());
 		left2.changeControlMode(TalonControlMode.Follower);
 		left2.enableControl();
-		left2.enableBrakeMode(true);
 		left2.set(left1.getDeviceID());
 		autoGoal = Goal.DO_NOTHING;
 		state = State.INIT;
@@ -134,7 +134,8 @@ public class Drive
 	{
 
 		ahrs.zeroYaw();
-
+//		right1.setVoltageRampRate(2.0 * multiplier); // 0 Volts to 4 Volts in one second
+//		left1.setVoltageRampRate(2.0); 
 		// currentAngle = ahrs.getYaw();
 		System.out.println("We are in AutoInit");
 		right1.setPosition(0);
@@ -142,7 +143,13 @@ public class Drive
 		visionAngle = 0;
 
 		switch (autoSelected)
-		{
+		{		
+		
+		case DRIVE_STRAIGHT_THEN_TURN:
+			autoGoal = Goal.DRIVE_STRAIGHT_THEN_TURN;
+			state = State.INIT;
+			break;
+		
 		case TURN_LEFT:
 			autoGoal = Goal.TURN_LEFT;
 			break;
@@ -187,9 +194,9 @@ public class Drive
 
 			case CENTER_GEAR_PLACEMENT:
 				System.out.println("Center Gear Placement");
-				turnAngle = 0;
+				startTime = 0;
 				timeOutValueSecondMove = .1;
-				autoGoal = Goal.TURN_GEAR_PLACEMENT;
+				autoGoal = Goal.CENTER_GEAR_PLACEMENT;
 				state = State.INIT;
 				break;
 
@@ -250,6 +257,73 @@ public class Drive
 
 		switch (autoGoal)
 		{
+		
+		case CENTER_GEAR_PLACEMENT:
+			
+			if(state == State.INIT){
+				if(driveStraightAutoWithInches(0.3, 98)){
+					state = State.WAIT_FOR_TIME;
+					startTime = Timer.getFPGATimestamp();
+				}
+				
+				}
+			else if (Timer.getFPGATimestamp() - startTime >= 2.0){
+				startTime = Timer.getFPGATimestamp();
+				state = State.GEAR_PLACEMENT;
+			}
+			else if(state == State.GEAR_PLACEMENT){
+				if(Timer.getFPGATimestamp() - startTime >= .45){
+					placeGearAutoStop(gear);
+					state = State.BACK_UP;
+				}
+				else{
+					placeGearAuto(gear);
+				}
+			}
+			
+			else if(state == State.BACK_UP){
+				if(driveStraightBackwardsAutoWithInches(0.3, 90)){
+					state = State.DONE;
+				}
+				
+				
+			}
+			
+			
+			break;
+		
+		case DRIVE_STRAIGHT_THEN_TURN:
+			if(state == State.INIT){
+			if(right1.getPosition() <= -600 * 3){
+				driveStraightAuto(0);
+				right1.setPosition(0);
+				startTime = Timer.getFPGATimestamp();
+				state = State.WAIT_FOR_TIME;
+			}
+			else{
+				driveStraightAuto(0.3);
+			}
+			}
+			else if (state == State.WAIT_FOR_TIME){
+				if(Timer.getFPGATimestamp() >= startTime + 0.5){
+					state = State.TURN;
+				}
+			}
+			
+			else if(state == State.TURN){
+				if(right1.getPosition() <= -600 * 2){
+					right1.set(0);
+					left1.set(0);
+					state = State.DONE;
+				}
+				else{
+					right1.set(-0.3 * multiplier * 1.5);
+					left1.set(0.3 * 0.5);
+				}
+			}
+			
+			break;
+		
 		case TURN_LEFT:
 			if(right1.getPosition() >= 600){
 				turnRightAuto(0);
@@ -303,26 +377,13 @@ public class Drive
 				else if (state == State.WAIT_FOR_TIME)
 				{
 
-					if (/*
-						 * Timer.getFPGATimestamp() >= (startTime +
-						 * timeoutValue)|| // 82 because of the 28 from the
-						 * length of the bot from the 110 inches taht it has to
-						 * travel // as well as the -5 because of the slight
-						 * coast
-						 */Math.abs(left1.getPosition()) > (82)
-							* ConstantMap.FAST_COUNTS_INCH)
+					if (driveStraightAutoWithInches(0.3, 98.0))
 					{
 						right1.set(0);
 						left1.set(0);
 						state = State.DONE;
 						startTime = Timer.getFPGATimestamp();
 					}
-					else
-					{
-//						chessyDriveAuto(-0.33, 0);
-						driveStraightAuto(.3);
-					}
-
 					// } else if (state == State.MOVE_TO_LIFT) {
 					//
 					// if (Timer.getFPGATimestamp() >= (startTime +
@@ -1167,7 +1228,7 @@ public class Drive
 	{
 
 		gear.gearClawSet(0.3);
-		gear.gearArmSet(0.5);
+		gear.gearArmSet(0.3);
 
 	}
 
@@ -1348,6 +1409,28 @@ public class Drive
 	private void driveStraightAuto(double speed) {
 		left1.set(speed);
 		right1.set(-speed * multiplier );
+	}
+	private boolean driveStraightAutoWithInches(double speed, double inches){
+		boolean finished = false;
+		if(Math.abs(left1.getPosition()) > (inches - 33 - 4) * ConstantMap.FAST_COUNTS_INCH){
+			finished = true;
+		}
+		else{
+			left1.set(speed);
+			right1.set(-speed * multiplier);
+		}
+		return finished;
+	}
+	private boolean driveStraightBackwardsAutoWithInches(double speed, double inches){
+		boolean finished = false;
+		if(Math.abs(left1.getPosition()) <= (inches - 15) * ConstantMap.FAST_COUNTS_INCH){
+			finished = true;
+		}
+		else{
+			left1.set(-speed);
+			right1.set(speed * multiplier);
+		}
+		return finished;
 	}
 	private void turnRightAuto(double speed){
 		double rightspeed = speed * multiplier;

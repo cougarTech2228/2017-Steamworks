@@ -67,9 +67,11 @@ public class Robot extends IterativeRobot
 	@Override
 	public void robotInit()
 	{
+		chooser.addObject("DRIVE STRAIGHT THEN TURN", ConstantMap.AutoChoices.DRIVE_STRAIGHT_THEN_TURN);
 		chooser.addObject("TURN LEFT", ConstantMap.AutoChoices.TURN_LEFT);
 		chooser.addObject("TURN RIGHT", ConstantMap.AutoChoices.TURN_RIGHT);	
 		chooser.addObject("DO NOTHING", ConstantMap.AutoChoices.DO_NOTHING);
+		chooser.addObject("CENTER GEAR PLACEMENT", AutoChoices.CENTER_GEAR_PLACEMENT);
 		chooser.addDefault("BASE LINE",
 				ConstantMap.AutoChoices.BASE_LINE_TIME_SENSOR);
 		chooser.addObject("LEFT SIDE BLUE GEAR",
