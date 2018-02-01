@@ -1,6 +1,7 @@
 package org.usfirst.frc.team2228.robot;
 
 import com.ctre.CANTalon;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -10,8 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Gear
 {
-	private CANTalon gearArm;
-	private CANTalon gearJaw;
+	private WPI_TalonSRX gearArm;
+	private WPI_TalonSRX gearJaw;
 	private boolean loadingActivated;
 	private Spark guide;
 	private boolean firstGearGuideCollectionValue = false;
@@ -55,8 +56,8 @@ public class Gear
 	{
 		guide = new Spark(RobotMap.GEAR_LOAD_STATION_GUIDE);
 		joystick = joy;
-		gearArm = new CANTalon(RobotMap.GEAR_ARM);
-		gearJaw = new CANTalon(RobotMap.GEAR_JAW);
+		gearArm = new WPI_TalonSRX(RobotMap.GEAR_ARM);
+		gearJaw = new WPI_TalonSRX(RobotMap.GEAR_JAW);
 
 		potentiometerArm = new AnalogInput(0);
 		potentiometerJaw = new AnalogInput(1);
@@ -84,17 +85,14 @@ public class Gear
 	}
 
 	// Called continuously during the teleop period
-	public void teleopPeriodic(Fuel fuel) {
+	public void teleopPeriodic() {
 		gearCollection = joystick.getRawButton(RobotMap.BUTTON_2_COLLECT_THE_GEAR);
 		gearGraspRelease = joystick.getRawButton(RobotMap.BUTTON_3_RELEASE_THE_GEAR);
 		if (gearCollection) {
 			gearJaw.set(gearCollectionValue);
 		} else if (gearGraspRelease) {
 			gearJaw.set(gearReleaseValue);
-		} else {
-			gearJaw.set(0);
-		}
-
+		} 
 		moveGearArmUp = joystick.getRawButton(RobotMap.BUTTON_6_MOVE_ARM_UP);
 		moveGearArmDown = joystick.getRawButton(RobotMap.BUTTON_5_MOVE_ARM_DOWN);
 
@@ -109,7 +107,7 @@ public class Gear
 			gearArm.set(armDown);
 			// gearJaw.set(gearCollectionValue);
 		} else {
-			gearArm.set(0);
+			gearArm.
 			// leftGearCollector.set(0);
 			// gearCollector.set(0);
 		} //

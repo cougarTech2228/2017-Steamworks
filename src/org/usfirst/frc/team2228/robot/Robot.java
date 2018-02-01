@@ -38,8 +38,7 @@ public class Robot extends IterativeRobot {
 	// Carrying the classes from this project's library
 	private Joystick joystick;
 	private Gear gear;
-	private Fuel fuel;
-	private Climb climb;
+
 	private Drive drive;
 	private PowerDistributionPanel pdp;
 
@@ -82,11 +81,11 @@ public class Robot extends IterativeRobot {
 
 		joystick = new Joystick(RobotMap.RIGHT_SIDE_JOYSTICK_ONE);
 		pdp = new PowerDistributionPanel();
-		fuel = new Fuel(joystick, pdp);
+
 
 		gear = new Gear(joystick);
-		drive = new Drive(joystick, gear, fuel);
-		climb = new Climb(joystick, pdp);
+		drive = new Drive(joystick, gear);
+
 
 		pan = new Servo(3);
 		tilt = new Servo(4);
@@ -164,7 +163,7 @@ public class Robot extends IterativeRobot {
 
 		// Calling the code from the drive class
 		drive.teleopPeriodic();
-		climb.teleopPeriodic();
+	
 		// fuel.teleopPeriodic();
 		gear.teleopPeriodic(fuel);
 
